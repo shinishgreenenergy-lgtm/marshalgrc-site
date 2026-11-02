@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Seal } from "./components/Logo";
 import { Marquee } from "./components/Marquee";
 import { ObligationIndex } from "./components/ObligationIndex";
-import { TRIAD, QUALITIES, PRESSURE, OFFER, ENGAGEMENT } from "./content";
+import { path, TRIAD, QUALITIES, PRESSURE, OFFER, ENGAGEMENT } from "./content";
 
 /** The headline, broken where it should break. Each line is masked and rises
  *  on load — one orchestrated moment, and the only motion above the fold. */
@@ -28,7 +28,7 @@ export default function Home() {
               against ISO, SOC 2, NIST, privacy laws and AI standards from the same place.
             </p>
             <div className="cta-row">
-              <a className="btn btn-primary" href="/contact/#demo">Request a demo</a>
+              <a className="btn btn-primary" href={path("/contact/#demo")}>Request a demo</a>
               <Link className="btn btn-ghost" href="/platform">See the platform</Link>
             </div>
           </div>
@@ -116,7 +116,7 @@ export default function Home() {
                   <h3>{o.title}</h3>
                   <p>{o.body}</p>
                   {o.href.startsWith("/contact") ? (
-                    <a className="more" href={o.href}>{o.cta}</a>
+                    <a className="more" href={path(o.href)}>{o.cta}</a>
                   ) : (
                     <Link className="more" href={o.href}>{o.cta}</Link>
                   )}
@@ -149,7 +149,7 @@ export default function Home() {
       <section className="cta-band">
         <div className="wrap">
           <h2>See how your controls would map before you commit.</h2>
-          <a className="btn btn-primary" href="/contact/#demo">Request a demo</a>
+          <a className="btn btn-primary" href={path("/contact/#demo")}>Request a demo</a>
         </div>
       </section>
     </>

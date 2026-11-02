@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SITE } from "../content";
+import { SITE, path } from "../content";
 import { Logo } from "./Logo";
 
 export function SiteFooter() {
@@ -26,8 +26,8 @@ export function SiteFooter() {
             <h4>Get in touch</h4>
             <ul>
               <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
-              <li><a href="/contact/#demo">Request a demo</a></li>
-              <li><a href="/contact/#enquiry">Send an enquiry</a></li>
+              <li><a href={path("/contact/#demo")}>Request a demo</a></li>
+              <li><a href={path("/contact/#enquiry")}>Send an enquiry</a></li>
             </ul>
           </div>
         </div>

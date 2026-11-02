@@ -5,6 +5,15 @@
 
 const origin = process.env.NEXT_PUBLIC_SITE_ORIGIN?.replace(/\/$/, "");
 
+/**
+ * next/link prefixes basePath automatically; a plain <a> or <img> does not.
+ * GitHub Pages project sites serve from /<repo>, so every hand-written
+ * absolute path has to go through here or it 404s once deployed.
+ * Used for the tab deep-links (which must be real anchors) and brand assets.
+ */
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
+export const path = (p: string) => `${BASE}${p}`;
+
 export const SITE = {
   /** Until a real domain is confirmed this stays invalid, which forces
    *  noindex + a disallow-all robots.txt. Set NEXT_PUBLIC_SITE_ORIGIN to go live. */

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { NAV, SITE } from "../content";
+import { NAV, SITE, path } from "../content";
 import { Logo } from "./Logo";
 
 const strip = (p: string) => (p.length > 1 ? p.replace(/\/$/, "") : p);
@@ -44,7 +44,7 @@ export function SiteHeader() {
           ))}
           {/* A plain anchor: this targets a tab on the contact page, and a full
               load guarantees the right tab opens even from /contact itself. */}
-          <a className="btn btn-primary" href="/contact/#demo">Request a demo</a>
+          <a className="btn btn-primary" href={path("/contact/#demo")}>Request a demo</a>
         </nav>
       </div>
     </header>

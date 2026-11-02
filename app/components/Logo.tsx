@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import { path } from "../content";
 
 /**
  * The live product's own mark, taken from the Stellar Marshal client portal:
@@ -9,7 +10,7 @@
 export function Logo({ short = false, className }: { short?: boolean; className?: string }) {
   return (
     <img
-      src={short ? "/logo-short.svg" : "/logo.svg"}
+      src={path(short ? "/logo-short.svg" : "/logo.svg")}
       alt="Stellar Marshal"
       className={className}
       width={short ? 34 : 160}

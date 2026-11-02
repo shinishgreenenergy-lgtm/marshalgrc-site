@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ServiceLedger } from "../components/ServiceLedger";
-import { SERVICES_HERO, AGNOSTIC, SECTORS } from "../content";
+import { path, SERVICES_HERO, AGNOSTIC, SECTORS } from "../content";
 
 export const metadata: Metadata = {
   title: "GRC services",
@@ -58,7 +58,7 @@ export default function ServicesPage() {
       <section className="cta-band invert on-field">
         <div className="wrap">
           <h2>Tell us which domain you need help with.</h2>
-          <a className="btn btn-primary" href="/contact/#enquiry">Send an enquiry</a>
+          <a className="btn btn-primary" href={path("/contact/#enquiry")}>Send an enquiry</a>
         </div>
       </section>
     </>

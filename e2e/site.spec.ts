@@ -132,6 +132,25 @@ test("the mobile menu opens and closes on navigation", async ({ page }, info) =>
   await expect(nav).toBeHidden();
 });
 
+test("every internal path carries the base path", async ({ page, baseURL }) => {
+  // GitHub Pages serves a project site from /<repo>. next/link prefixes that
+  // automatically but a plain <a> or <img> does not, so a missed one 404s
+  // only after deploy. The export is checked for raw paths that skipped it.
+  const base = process.env.NEXT_PUBLIC_BASE_PATH || "";
+  if (!base) test.skip(true, "only meaningful for a prefixed build");
+  for (const route of ROUTES) {
+    await page.goto(route);
+    const bad = await page.evaluate((b) => {
+      const urls = [
+        ...[...document.querySelectorAll("a[href^='/']")].map((a) => a.getAttribute("href")!),
+        ...[...document.querySelectorAll("img[src^='/']")].map((i) => i.getAttribute("src")!),
+      ];
+      return urls.filter((u) => !u.startsWith(b + "/") && u !== b);
+    }, base);
+    expect(bad, `${route} has unprefixed paths`).toEqual([]);
+  }
+});
+
 test("no page scrolls sideways on a phone", async ({ page }, info) => {
   test.skip(info.project.name !== "mobile", "mobile layout only");
   for (const route of ROUTES) {
