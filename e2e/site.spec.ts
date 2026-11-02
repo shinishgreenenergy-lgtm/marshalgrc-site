@@ -189,6 +189,17 @@ test("a completed form is addressed to the forms inbox", async ({ page }) => {
   await expect(page.getByRole("link", { name: "victor.m@marshalgrc.com" })).toBeVisible();
 });
 
+test("the header never wraps to a second line", async ({ page }) => {
+  // Wrapping, unlike overflow, leaves scrollWidth untouched, so the sweep for
+  // horizontal scroll cannot see it. Measure the row height instead.
+  for (const w of [1121, 1200, 1280, 1440, 1920]) {
+    await page.setViewportSize({ width: w, height: 800 });
+    await page.goto("/");
+    const h = await page.locator(".head-row").evaluate((e) => e.getBoundingClientRect().height);
+    expect(h, `header grew to ${h}px at ${w}px wide`).toBeLessThan(90);
+  }
+});
+
 test.describe("accessibility", () => {
   for (const route of ROUTES) {
     test(`${route} has no axe violations`, async ({ page }) => {

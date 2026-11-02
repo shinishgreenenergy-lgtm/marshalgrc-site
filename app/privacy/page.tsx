@@ -57,10 +57,11 @@ export default function PrivacyPage() {
 
           <h2>Hosting and server logs</h2>
           <p>
-            <span className="todo">[Hosting provider to be confirmed]</span> serves these
-            pages. Like most web servers it records requests, which typically includes IP
-            addresses. The retention period for those logs is{" "}
-            <span className="todo">[to be confirmed with the hosting provider]</span>.
+            These pages are served by GitHub Pages. Like most web servers it records
+            requests, which typically includes IP addresses; GitHub&apos;s own privacy
+            statement covers that processing. The retention period is{" "}
+            <span className="todo">[to be confirmed]</span>, and this section must be
+            updated if the site moves to different hosting.
           </p>
 
           <h2>Your rights</h2>
