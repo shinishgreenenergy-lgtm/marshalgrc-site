@@ -10,14 +10,15 @@ export const metadata: Metadata = {
 export default function ServicesPage() {
   return (
     <>
-      <div className="band page-hero">
+      <div className="page-hero">
         <div className="wrap">
+          <span className="rule" aria-hidden="true" />
           <h1>{SERVICES_HERO.h1}</h1>
           <p className="lede">{SERVICES_HERO.lede}</p>
         </div>
       </div>
 
-      <div className="section">
+      <section className="section" style={{ paddingTop: "clamp(32px,4vw,56px)" }}>
         <div className="wrap">
           <div className="agnostic">
             {AGNOSTIC.map((a) => (
@@ -28,20 +29,20 @@ export default function ServicesPage() {
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="section" style={{ paddingTop: 0 }}>
+      <section className="section" style={{ paddingTop: 0 }}>
         <div className="wrap">
           <ServiceLedger />
         </div>
-      </div>
+      </section>
 
-      <div className="section">
-        <div className="wrap ruled">
-          <div className="section-head">
+      <section className="section">
+        <div className="wrap spread">
+          <header>
             <h2>{SECTORS.heading}</h2>
             <p className="lede">{SECTORS.lede}</p>
-          </div>
+          </header>
           <div className="sectors">
             {SECTORS.rows.map((s) => (
               <div className="sector-row" key={s.sector}>
@@ -52,14 +53,14 @@ export default function ServicesPage() {
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="band cta-band">
+      <section className="cta-band invert on-field">
         <div className="wrap">
           <h2>Tell us which domain you need help with.</h2>
           <a className="btn btn-primary" href="/contact/#enquiry">Send an enquiry</a>
         </div>
-      </div>
+      </section>
     </>
   );
 }

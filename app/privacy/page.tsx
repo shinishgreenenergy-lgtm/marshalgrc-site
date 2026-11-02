@@ -15,8 +15,9 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <>
-      <div className="band page-hero">
+      <div className="page-hero">
         <div className="wrap">
+          <span className="rule" aria-hidden="true" />
           <h1>Privacy</h1>
           <p className="lede">
             What this website collects, what it does not, and who to contact about it.

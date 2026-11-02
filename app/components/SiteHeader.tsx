@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NAV, SITE } from "../content";
-import { Shield, Wordmark } from "./Logo";
+import { Logo } from "./Logo";
 
 const strip = (p: string) => (p.length > 1 ? p.replace(/\/$/, "") : p);
 
@@ -20,8 +20,7 @@ export function SiteHeader() {
     <header className="site-head">
       <div className="wrap head-row">
         <Link className="brand" href="/" aria-label={`${SITE.name} home`}>
-          <Shield color="var(--glow)" />
-          <Wordmark />
+          <Logo />
         </Link>
 
         <button

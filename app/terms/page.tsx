@@ -10,8 +10,9 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <>
-      <div className="band page-hero">
+      <div className="page-hero">
         <div className="wrap">
+          <span className="rule" aria-hidden="true" />
           <h1>Terms</h1>
           <p className="lede">The terms that apply to the use of this website.</p>
         </div>

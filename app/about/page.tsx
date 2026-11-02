@@ -9,8 +9,9 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
-      <div className="band page-hero">
+      <div className="page-hero">
         <div className="wrap">
+          <span className="rule" aria-hidden="true" />
           <h1>{ABOUT_HERO.h1}</h1>
           <p className="lede">{ABOUT_HERO.lede}</p>
         </div>
@@ -34,7 +35,7 @@ export default function AboutPage() {
         </div>
       </div>
 
-      <div className="band section">
+      <div className="invert section">
         <div className="wrap">
           <h2 style={{ maxWidth: "24ch" }}>{ABOUT.geoHeading}</h2>
           <div className="geo">

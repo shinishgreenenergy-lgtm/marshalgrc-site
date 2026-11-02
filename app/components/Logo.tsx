@@ -1,24 +1,32 @@
-/** Shield with three stacked control bars. Used in the header, the footer
- *  and at the centre of the control lattice, so it lives in one place. */
-export function Shield({ size = 30, color = "currentColor" }: { size?: number; color?: string }) {
-  const h = (size / 30) * 36;
+/* eslint-disable @next/next/no-img-element */
+
+/**
+ * The live product's own mark, taken from the Stellar Marshal client portal:
+ * a shield holding a gold padlock shackle over three blue bars. It is an
+ * `img` rather than inlined SVG because the file is the brand asset itself —
+ * swapping it should not mean editing a component.
+ */
+export function Logo({ short = false, className }: { short?: boolean; className?: string }) {
   return (
-    <svg width={size} height={h} viewBox="0 0 30 36" aria-hidden="true" focusable="false">
-      <path
-        d="M15 1.5 L28 6 V17 C28 25.5 22.5 31.5 15 34.5 C7.5 31.5 2 25.5 2 17 V6 Z"
-        fill="none" stroke={color} strokeWidth="2"
-      />
-      <rect x="8.5" y="12" width="13" height="3" rx="1.5" fill={color} />
-      <rect x="8.5" y="17" width="13" height="3" rx="1.5" fill={color} opacity=".75" />
-      <rect x="8.5" y="22" width="13" height="3" rx="1.5" fill={color} opacity=".5" />
-    </svg>
+    <img
+      src={short ? "/logo-short.svg" : "/logo.svg"}
+      alt="Stellar Marshal"
+      className={className}
+      width={short ? 34 : 160}
+      height={34}
+    />
   );
 }
 
-export function Wordmark() {
+/** A gold seal echoing the shackle in the mark. The site's only ornament:
+ *  in this trade a seal means something was checked and passed. */
+export function Seal() {
   return (
-    <span className="brand-word">
-      Marshal<span>GRC</span>
-    </span>
+    <svg className="seal" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+      <circle cx="60" cy="60" r="56" />
+      <circle cx="60" cy="60" r="48" strokeDasharray="2 5" />
+      <path d="M44 66v-6a16 16 0 0 1 32 0v6" />
+      <path d="M40 70h40M40 80h40M40 90h40" strokeWidth="3" strokeLinecap="round" />
+    </svg>
   );
 }

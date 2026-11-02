@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { SITE } from "../content";
-import { Shield, Wordmark } from "./Logo";
+import { Logo } from "./Logo";
 
 export function SiteFooter() {
   return (
@@ -9,8 +9,7 @@ export function SiteFooter() {
         <div className="foot-grid">
           <div>
             <Link className="brand" href="/" aria-label={`${SITE.name} home`}>
-              <Shield color="var(--glow)" />
-              <Wordmark />
+              <Logo />
             </Link>
             <p style={{ maxWidth: "36ch" }}>{SITE.tagline}</p>
           </div>

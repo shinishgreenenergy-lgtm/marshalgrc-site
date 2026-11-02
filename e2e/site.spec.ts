@@ -47,19 +47,39 @@ test("no internal link is dead", async ({ page, baseURL }) => {
   }
 });
 
-test("the lattice places every framework around the ring", async ({ page }) => {
+test("the obligation index lists every framework with its domain", async ({ page }) => {
   await page.goto("/");
-  const boxes = await page.locator(".lattice .pill").evaluateAll((els) =>
-    els.map((e) => {
-      const b = e.getBoundingClientRect();
-      return `${Math.round(b.x)},${Math.round(b.y)}`;
-    }),
-  );
-  expect(boxes).toHaveLength(8);
-  // A CSS transform in the reveal animation overrides the SVG transform
-  // attribute and stacks every pill on the origin; distinct positions prove
-  // the figure is actually laid out.
-  expect(new Set(boxes).size).toBe(8);
+  const rows = page.locator(".index-list button");
+  await expect(rows).toHaveCount(8);
+  await expect(rows.first()).toContainText("ISO 27001");
+  await expect(rows.first()).toContainText("Cybersecurity");
+});
+
+test("the hero headline is readable with motion switched off", async ({ browser }) => {
+  // The juror test: kill the motion and the static frame must still hold.
+  // toBeVisible() passes on a stuck reveal, so assert the settled position.
+  const ctx = await browser.newContext({ reducedMotion: "reduce" });
+  const page = await ctx.newPage();
+  await page.goto("/");
+  const lines = page.locator(".hero h1 .ln > span");
+  await expect(lines).toHaveCount(3);
+  for (let i = 0; i < 3; i++) {
+    const box = await lines.nth(i).boundingBox();
+    const mask = await lines.nth(i).locator("xpath=..").boundingBox();
+    expect(Math.abs((box?.y ?? 0) - (mask?.y ?? 0)), "line must sit inside its mask").toBeLessThan(2);
+  }
+  await ctx.close();
+});
+
+test("the marquee never moves on its own", async ({ page }) => {
+  await page.goto("/");
+  const track = page.locator(".marquee-track");
+  const before = await track.evaluate((e) => getComputedStyle(e).transform);
+  await page.waitForTimeout(1200);
+  const after = await track.evaluate((e) => getComputedStyle(e).transform);
+  // Driven by scroll position, so it is not "moving content" under WCAG 2.2.2
+  // and needs no pause control.
+  expect(after).toBe(before);
 });
 
 test("the services index jumps to the matching domain", async ({ page }) => {
@@ -95,7 +115,7 @@ test("an empty form reports its errors instead of submitting", async ({ page }) 
 test("selecting a standard dims the domains it does not reach", async ({ page }) => {
   await page.goto("/platform/");
   const matrix = page.locator(".matrix");
-  await matrix.getByRole("button", { name: "GDPR" }).click();
+  await matrix.getByRole("button", { name: "GDPR", exact: true }).click();
   await expect(matrix).toHaveAttribute("data-dim", "true");
   await expect(matrix.locator('.matrix-row[data-match="false"]')).toHaveCount(3);
 });

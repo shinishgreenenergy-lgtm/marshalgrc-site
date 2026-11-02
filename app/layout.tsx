@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import { Sora, IBM_Plex_Sans } from "next/font/google";
+import { Poppins, Geist } from "next/font/google";
 import { SiteHeader } from "./components/SiteHeader";
 import { SiteFooter } from "./components/SiteFooter";
 import { SITE } from "./content";
 import "./globals.css";
 
-const display = Sora({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display", display: "swap" });
-const body = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-body", display: "swap" });
+// Both faces are the ones the Stellar Marshal product already ships, so the
+// site and the app read as one brand. Poppins is also the closest match to the
+// geometric wordmark in the logo.
+const display = Poppins({ subsets: ["latin"], weight: ["500", "600"], variable: "--font-display", display: "swap" });
+const body = Geist({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-body", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.origin),

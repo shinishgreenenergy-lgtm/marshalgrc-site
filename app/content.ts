@@ -32,10 +32,19 @@ export const NAV = [
 export const HERO = {
   h1: "One control set. Every framework you answer to.",
   lede: "MarshalGRC is a governance, risk and compliance platform with an in-house advisory team behind it. Map your controls once, collect evidence once, and report against ISO, SOC 2, NIST, privacy laws and AI standards from the same place.",
-  /** Nodes of the control lattice. Order sets their position on the ring. */
-  frameworks: ["ISO 27001", "SOC 2", "NIST CSF", "ISO 42001", "DPDP Act", "GDPR", "HIPAA", "ISO 22301"],
-  /** Index pairs that share controls, drawn as chords across the lattice. */
-  chords: [[0, 1], [0, 2], [0, 3], [4, 5], [5, 6], [2, 7], [3, 4]] as const,
+  /** The headline obligations. Each `reach` is the governance domain that
+   *  framework sits under in COVERAGE below — no framework is claimed here
+   *  that the platform page does not already list. */
+  frameworks: [
+    { name: "ISO 27001", reach: "Cybersecurity" },
+    { name: "SOC 2", reach: "Cybersecurity" },
+    { name: "NIST CSF", reach: "Cybersecurity" },
+    { name: "ISO 42001", reach: "AI governance" },
+    { name: "DPDP Act", reach: "Data privacy and protection" },
+    { name: "GDPR", reach: "Data privacy and protection" },
+    { name: "HIPAA", reach: "Data privacy and protection" },
+    { name: "ISO 22301", reach: "Business continuity and disaster recovery" },
+  ],
   caption: "Each requirement links back to one shared control.",
 };
 

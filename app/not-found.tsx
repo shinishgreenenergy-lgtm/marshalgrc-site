@@ -4,8 +4,9 @@ export const metadata = { title: "Page not found" };
 
 export default function NotFound() {
   return (
-    <div className="band page-hero" style={{ minHeight: "52vh" }}>
+    <div className="page-hero" style={{ minHeight: "52vh" }}>
       <div className="wrap">
+        <span className="rule" aria-hidden="true" />
         <h1>That page is not here</h1>
         <p className="lede">
           The address may be out of date. The platform, the services and the contact

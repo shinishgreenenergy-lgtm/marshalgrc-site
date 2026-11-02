@@ -11,13 +11,13 @@ mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch();
 
 for (const [size, width] of Object.entries(WIDTHS)) {
-  for (const scheme of ["light", "dark"]) {
-    const ctx = await browser.newContext({ viewport: { width, height: 1000 }, colorScheme: scheme, deviceScaleFactor: 1 });
+  {
+    const ctx = await browser.newContext({ viewport: { width, height: 1000 }, deviceScaleFactor: 1 });
     const page = await ctx.newPage();
     for (const r of ROUTES) {
       await page.goto(BASE + r, { waitUntil: "networkidle" });
       await page.waitForTimeout(2600); // let the lattice finish its sequence
-      const name = `${r === "/" ? "home" : r.replaceAll("/", "")}-${size}-${scheme}`;
+      const name = `${r === "/" ? "home" : r.replaceAll("/", "")}-${size}`;
       // Note: a full-page shot renders scroll-timeline animations at their
       // start state, so the evidence-flow rail looks absent here.
       await page.screenshot({ path: `${OUT}/${name}.jpg`, fullPage: true, quality: 72, type: "jpeg" });

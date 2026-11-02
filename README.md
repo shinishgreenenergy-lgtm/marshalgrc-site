@@ -27,13 +27,15 @@ evidence-flow rail looks absent in them.
 - **`app/content.ts`** holds every word on the site. Pages render from it, so
   copy changes never touch markup and no fact can drift between two pages.
 - **`app/globals.css`** holds the whole design system in CSS custom properties.
-  A palette change is a change to the two token blocks at the top; nothing
-  else references a colour directly.
+  A palette change is a change to the token block at the top; nothing else
+  references a colour directly. One light treatment only — no dark variant,
+  because the brand logo carries a white outline and is built for light.
 - **`app/components/`** holds the seven components that carry the design:
 
   | Component | What it does |
   |---|---|
-  | `ControlLattice` | The hero. Geometry is computed at build time, so the figure is in the HTML and ships no JavaScript. |
+  | `ObligationIndex` | The hero figure, as a register rather than a diagram. Hovering an obligation rules a gold line across and names its domain. |
+  | `Marquee` | The obligations ticker. Driven by page scroll, never a timer. |
   | `CoverageMatrix` | Choosing a standard dims every domain it does not reach. Pointer and keyboard are separate states so hover-then-click does not cancel itself. |
   | `EvidenceFlow` | The control lifecycle. Its rail draws as the section scrolls into view. |
   | `PostureDash` | Illustrative posture figures, with a real likelihood × impact risk grid. |
@@ -42,7 +44,20 @@ evidence-flow rail looks absent in them.
   | `SiteHeader` / `SiteFooter` | Shell. The header closes its mobile menu on navigation. |
 
 Motion is CSS only, gated behind `@supports (animation-timeline: view())` and
-switched off entirely under `prefers-reduced-motion`.
+switched off entirely under `prefers-reduced-motion`. Nothing moves on a timer,
+so WCAG 2.2.2 needs no pause control. A test asserts the hero headline still
+sits in place with motion disabled.
+
+## Brand
+
+Colours and the logo come from the live product at `client.kryilinfotech.com`,
+not from an interpretation: deep blue `#0F3054`, mid blue `#3B8DCB`, gold
+`#9C7945` → `#FAF3AA` are that app's own gradient stops, and `public/logo.svg`
+is its asset. Typefaces (Poppins, Geist) are the ones the app already ships.
+
+Gold is reserved for assurance moments — a seal, a stage rule, a passed tick.
+It is never used for body text: `#9C7945` only reaches 3.8:1 on the paper, so
+`--gold-ink` exists for the rare case gold has to carry words.
 
 ## Things to know before changing it
 
@@ -53,11 +68,18 @@ switched off entirely under `prefers-reduced-motion`.
   The lattice reveal animates opacity only for exactly this reason; there is a
   test that fails if the pills collapse onto the origin again.
 - `.nav a` is more specific than `.btn-primary`, so the header CTA restates its
-  colour at `.nav` scope. Without it the button fails contrast at 1.3:1.
+  colour at `.nav` scope. Without it the button fails contrast. This one has
+  now been reintroduced twice by rewrites — check it after any CSS rewrite.
+- The inverted deep-blue section is `.invert`, **not** `.field`. The contact
+  form already uses `.field` for its field wrappers, and the collision gave
+  every input a deep-blue background.
+- Never dim text with `opacity`. It lowers contrast invisibly — `.68` on the
+  index labels took them to 4.05:1. Dim with a colour token instead.
 - Do not serve the export with `serve -s`. The `--single` flag rewrites every
   path to `index.html`, which makes route tests pass against the home page.
-- In dark mode the bands sit **above** `--bg`, not below it. Dropping them
-  darker makes the hero, the CTA band and the lead panel vanish into the page.
+- The footer sits the logo on a white plate. The wordmark's "STELLAR" is solid
+  black, so the lockup dies on the deep blue; the plate is the brand-correct
+  fix, not recolouring someone else's logo.
 
 ## Before launch
 
@@ -69,9 +91,10 @@ switched off entirely under `prefers-reduced-motion`.
 3. **Legal review of `/privacy/` and `/terms/`.** Both name what is genuinely
    unknown (hosting provider, log retention, registered entity, governing law)
    rather than inventing it. The unknowns are marked in the same highlight.
-4. **Confirm the logo.** The shield in `app/components/Logo.tsx` is the one from
-   the source design. The `STELLAR_MARSHAL*` artwork in `~/Downloads` has not
-   been used and needs a decision.
+4. **Settle the name.** The product app brands itself **Stellar Marshal**; this
+   site says **MarshalGRC**, and the footer says it is a Stellar Global product.
+   The header logo now reads "Stellar Marshal" while the copy says MarshalGRC.
+   One of the two has to give.
 5. **Resolve "seven domains".** `OFFER` on the home page says services span
    "seven domains", but `/services/` lists eight. The inconsistency is in the
    source design and has been carried over verbatim rather than guessed at.
