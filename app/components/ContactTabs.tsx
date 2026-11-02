@@ -34,8 +34,8 @@ const ENQUIRY_FIELDS: FieldDef[] = [
   { id: "e-msg", name: "Message", label: "Your message", type: "textarea", required: true, full: true },
 ];
 
-/** Submissions open the visitor's own mail client. Nothing is posted to a
- *  server, so the static site stores no enquiry data at all. */
+/** Submissions open the visitor's own mail client, addressed to SITE.formsTo.
+ *  Nothing is posted to a server, so the static site stores no enquiry data. */
 function EnquiryForm({ kind, fields, submitLabel }: { kind: string; fields: FieldDef[]; submitLabel: string }) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<string | null>(null);
@@ -72,10 +72,10 @@ function EnquiryForm({ kind, fields, submitLabel }: { kind: string; fields: Fiel
       .filter(Boolean);
 
     const href =
-      `mailto:${SITE.email}?subject=${encodeURIComponent(`${SITE.name} website: ${kind}`)}` +
+      `mailto:${SITE.formsTo}?subject=${encodeURIComponent(`${SITE.name} website: ${kind}`)}` +
       `&body=${encodeURIComponent(lines.join("\n"))}`;
     window.location.href = href;
-    setStatus("Your email app should open with the request ready to send. If it does not, email " + SITE.email + " directly.");
+    setStatus("Your email app should open with the request ready to send. If it does not, email " + SITE.formsTo + " directly.");
   }
 
   return (

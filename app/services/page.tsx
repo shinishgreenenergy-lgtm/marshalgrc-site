@@ -1,15 +1,41 @@
 import type { Metadata } from "next";
 import { ServiceLedger } from "../components/ServiceLedger";
-import { path, SERVICES_HERO, AGNOSTIC, SECTORS } from "../content";
+import { path, SERVICES_HERO, AGNOSTIC, SECTORS, SERVICES, SITE } from "../content";
 
 export const metadata: Metadata = {
   title: "GRC services",
   description: SERVICES_HERO.lede,
+  alternates: { canonical: "/services/" },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.origin}/` },
+        { "@type": "ListItem", position: 2, name: "GRC services", item: `${SITE.origin}/services/` },
+      ],
+    },
+    ...SERVICES.map((s) => ({
+      "@type": "Service",
+      name: s.title,
+      serviceType: s.title,
+      description: s.lines.map((l) => l.title).join(", "),
+      provider: { "@type": "Organization", name: SITE.name },
+      url: `${SITE.origin}/services/#${s.id}`,
+    })),
+  ],
 };
 
 export default function ServicesPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="page-hero">
         <div className="wrap">
           <span className="rule" aria-hidden="true" />
@@ -20,6 +46,10 @@ export default function ServicesPage() {
 
       <section className="section" style={{ paddingTop: "clamp(32px,4vw,56px)" }}>
         <div className="wrap">
+          {/* Without this the page goes h1 -> h3, which breaks the outline for
+              both screen readers and crawlers. The wording only names what the
+              three blocks below already are. */}
+          <h2 className="agnostic-head">Three ways to work with us</h2>
           <div className="agnostic">
             {AGNOSTIC.map((a) => (
               <div key={a.title}>

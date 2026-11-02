@@ -42,6 +42,7 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+          <a className="portal-link" href={SITE.portal} rel="noopener">Client login</a>
           {/* A plain anchor: this targets a tab on the contact page, and a full
               load guarantees the right tab opens even from /contact itself. */}
           <a className="btn btn-primary" href={path("/contact/#demo")}>Request a demo</a>

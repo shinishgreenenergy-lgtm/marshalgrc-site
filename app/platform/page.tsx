@@ -2,16 +2,30 @@ import type { Metadata } from "next";
 import { CoverageMatrix } from "../components/CoverageMatrix";
 import { EvidenceFlow } from "../components/EvidenceFlow";
 import { PostureDash } from "../components/PostureDash";
-import { PLATFORM_HERO, COVERAGE, WORKFLOW, DASHBOARDS, REPORTING, RESIDENCY } from "../content";
+import { PLATFORM_HERO, COVERAGE, WORKFLOW, DASHBOARDS, REPORTING, RESIDENCY, SITE } from "../content";
 
 export const metadata: Metadata = {
   title: "GRC platform",
   description: PLATFORM_HERO.lede,
+  alternates: { canonical: "/platform/" },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.origin}/` },
+    { "@type": "ListItem", position: 2, name: "GRC platform", item: `${SITE.origin}/platform/` },
+  ],
 };
 
 export default function PlatformPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="page-hero">
         <div className="wrap">
           <span className="rule" aria-hidden="true" />

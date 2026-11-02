@@ -5,6 +5,7 @@ import { CONTACT_HERO, CONTACT, SITE } from "../content";
 export const metadata: Metadata = {
   title: "Contact us",
   description: CONTACT_HERO.lede,
+  alternates: { canonical: "/contact/" },
 };
 
 export default function ContactPage() {
@@ -29,7 +30,11 @@ export default function ContactPage() {
             </div>
             <div className="block">
               <h3>WhatsApp</h3>
-              <p><span className="todo">{CONTACT.reach.whatsapp}</span></p>
+              <p>
+                <a href={`https://wa.me/${CONTACT.reach.whatsapp.replace(/\D/g, "")}`}>
+                  {CONTACT.reach.whatsapp}
+                </a>
+              </p>
             </div>
             <div className="block">
               <h3>India office</h3>
@@ -38,10 +43,6 @@ export default function ContactPage() {
                   <span key={l}>{l}{i < CONTACT.reach.india.length - 1 ? <br /> : null}</span>
                 ))}
               </address>
-            </div>
-            <div className="block">
-              <h3>US office</h3>
-              <address><span className="todo">{CONTACT.reach.us}</span></address>
             </div>
           </aside>
         </div>

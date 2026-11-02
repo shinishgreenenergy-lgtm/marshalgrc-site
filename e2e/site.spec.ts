@@ -163,6 +163,32 @@ test("no page scrolls sideways on a phone", async ({ page }, info) => {
   }
 });
 
+test("the client portal link points at the live portal", async ({ page }) => {
+  await page.goto("/");
+  // Read the attribute off the DOM: on a phone the nav is collapsed, so a
+  // role-based locator would not see it.
+  const hrefs = await page.locator('a:text-is("Client login")').evaluateAll((as) =>
+    as.map((a) => a.getAttribute("href")),
+  );
+  expect(hrefs.length).toBeGreaterThanOrEqual(2); // header and footer
+  expect(new Set(hrefs)).toEqual(new Set(["https://client.kryilinfotech.com/login"]));
+});
+
+test("a completed form is addressed to the forms inbox", async ({ page }) => {
+  // The forms go to a different address from the one shown publicly, and the
+  // privacy notice has to name the same one.
+  await page.goto("/contact/");
+  const demo = page.locator("#panel-demo");
+  await demo.getByLabel("Full name").fill("Test Person");
+  await demo.getByLabel("Work email").fill("test@example.com");
+  await demo.getByLabel("Organisation").fill("Example Ltd");
+  await demo.getByRole("button", { name: "Request a demo" }).click();
+  await expect(page.locator("#panel-demo .form-status")).toContainText("victor.m@marshalgrc.com");
+
+  await page.goto("/privacy/");
+  await expect(page.getByRole("link", { name: "victor.m@marshalgrc.com" })).toBeVisible();
+});
+
 test.describe("accessibility", () => {
   for (const route of ROUTES) {
     test(`${route} has no axe violations`, async ({ page }) => {

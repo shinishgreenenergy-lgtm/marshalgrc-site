@@ -24,7 +24,12 @@ export const SITE = {
   tagline: "A governance, risk and compliance platform with the advisory team to run it.",
   description:
     "MarshalGRC is a GRC platform with an in-house advisory team covering cybersecurity, data privacy, AI governance, business continuity, ITSM, EHS and quality management.",
-  email: "contact@marshalgrc.com",
+  email: "info@marshalgrc.com",
+  /** The live client portal. External, so it never goes through path(). */
+  portal: "https://client.kryilinfotech.com/login",
+  /** Where the demo and enquiry forms are addressed. Deliberately separate
+   *  from `email`, which is the address shown publicly on the contact page. */
+  formsTo: "victor.m@marshalgrc.com",
   copyright: "© 2026 Stellar Global. MarshalGRC is a Stellar Global product.",
 } as const;
 
@@ -344,11 +349,10 @@ export const CONTACT = {
     body: "Questions about services, pricing or how we work. A consultant will reply.",
     services: ["Cybersecurity", "Business continuity and DR", "Data privacy", "AI governance", "IT service management", "EHS and industrial safety", "Quality management", "Managed GRC resources", "Something else"],
   },
-  /** Items in square brackets are unresolved and render as flagged placeholders. */
   reach: {
-    whatsapp: "[WhatsApp number]",
+    /** Display form; the wa.me link strips it back to digits at the call site. */
+    whatsapp: "+91 99896 61572",
     india: ["Stellar Global", "D No: 14-164/1/2, Parvati Nilayam", "Chinamushidiwada, Visakhapatnam", "Andhra Pradesh 530051, India"],
-    us: "[US office address]",
   },
   next: {
     heading: "What happens after you get in touch",

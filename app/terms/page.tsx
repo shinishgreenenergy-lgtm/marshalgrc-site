@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Terms",
   description:
     "The terms that apply to this website. Items still to be confirmed before launch are marked.",
+  alternates: { canonical: "/terms/" },
 };
 
 export default function TermsPage() {
@@ -22,9 +23,8 @@ export default function TermsPage() {
         <div className="wrap prose">
           <h2>Who operates this site</h2>
           <p>
-            This website is operated by {SITE.parent}. {SITE.name} is a {SITE.parent}{" "}
-            product. The registered company details are{" "}
-            <span className="todo">[to be confirmed before launch]</span>.
+            This website is operated by {SITE.parent}, Visakhapatnam, India.{" "}
+            {SITE.name} is a {SITE.parent} product.
           </p>
 
           <h2>What the content is for</h2>
@@ -55,8 +55,9 @@ export default function TermsPage() {
 
           <h2>Governing law</h2>
           <p>
-            <span className="todo">[Governing law and jurisdiction to be confirmed]</span>.
-            This page has not yet been reviewed by a legal adviser.
+            These terms are governed by the laws of India, and the courts at
+            Visakhapatnam, Andhra Pradesh have exclusive jurisdiction over any dispute
+            arising from them. This page has not yet been reviewed by a legal adviser.
           </p>
 
           <h2>Contact</h2>

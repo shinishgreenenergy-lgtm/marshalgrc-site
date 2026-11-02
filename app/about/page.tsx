@@ -4,6 +4,7 @@ import { ABOUT_HERO, ABOUT } from "../content";
 export const metadata: Metadata = {
   title: "About us",
   description: ABOUT_HERO.lede,
+  alternates: { canonical: "/about/" },
 };
 
 export default function AboutPage() {

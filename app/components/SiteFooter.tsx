@@ -28,6 +28,7 @@ export function SiteFooter() {
               <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
               <li><a href={path("/contact/#demo")}>Request a demo</a></li>
               <li><a href={path("/contact/#enquiry")}>Send an enquiry</a></li>
+              <li><a href={SITE.portal} rel="noopener">Client login</a></li>
             </ul>
           </div>
         </div>

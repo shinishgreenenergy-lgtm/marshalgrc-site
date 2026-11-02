@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   },
   description: SITE.description,
   applicationName: SITE.name,
+  alternates: { canonical: "/" },
   // Until a real origin is configured the site must not be indexed.
   robots: SITE.indexable ? { index: true, follow: true } : { index: false, follow: false },
   openGraph: {
@@ -31,15 +32,16 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: SITE.name, description: SITE.description },
 };
 
-/** Only facts that are actually known go in the structured data: the
- *  unresolved US address and WhatsApp number are deliberately absent. */
-const jsonLd = {
+/** Only facts that are actually known go in the structured data. There is one
+ *  office and one number now, so both are here; nothing else is claimed. */
+const organization = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: SITE.name,
   description: SITE.description,
   url: SITE.origin,
   email: SITE.email,
+  telephone: "+919989661572",
   parentOrganization: { "@type": "Organization", name: SITE.parent },
   address: {
     "@type": "PostalAddress",
@@ -51,6 +53,16 @@ const jsonLd = {
   },
   areaServed: ["India", "United States", "Canada", "Europe", "Middle East", "East Asia"],
 };
+
+const website = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE.name,
+  url: SITE.origin,
+  publisher: { "@type": "Organization", name: SITE.parent },
+};
+
+const jsonLd = { "@context": "https://schema.org", "@graph": [organization, website] };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

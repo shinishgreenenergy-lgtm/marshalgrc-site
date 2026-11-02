@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Privacy",
   description:
     "What this website collects, what it does not, and who to contact. Items still to be confirmed before launch are marked.",
+  alternates: { canonical: "/privacy/" },
 };
 
 /**
@@ -45,8 +46,8 @@ export default function PrivacyPage() {
           <p>
             Both forms are handled entirely in your browser. When you submit one, your
             own email application opens with the details filled in, addressed to{" "}
-            <a href={`mailto:${SITE.email}`}>{SITE.email}</a>. Nothing is transmitted to
-            this website and nothing is stored here. You choose whether to send the
+            <a href={`mailto:${SITE.formsTo}`}>{SITE.formsTo}</a>. Nothing is transmitted
+            to this website and nothing is stored here. You choose whether to send the
             message.
           </p>
           <p>
