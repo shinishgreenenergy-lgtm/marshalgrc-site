@@ -1,6 +1,6 @@
 // Pings IndexNow (Bing, Yandex, Naver, Seznam) with every URL in the sitemap.
 // Google does not use IndexNow. Inert until a real domain is configured.
-//   NEXT_PUBLIC_SITE_ORIGIN=https://marshalgrc.com node scripts/indexnow.mjs
+//   NEXT_PUBLIC_SITE_ORIGIN=https://www.marshalgrc.com node scripts/indexnow.mjs
 const KEY = "635466e016617bef5a1febe2afce5e58";
 const origin = process.env.NEXT_PUBLIC_SITE_ORIGIN?.replace(/\/$/, "");
 if (!origin) {

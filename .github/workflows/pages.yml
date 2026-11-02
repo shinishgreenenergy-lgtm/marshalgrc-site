@@ -24,11 +24,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # A project site is served from /<repo>, so the build needs that prefix.
-      # Taken from the repo name so a rename cannot silently break every asset.
+      # Served from a custom domain, so the site sits at the root and takes no
+      # base path. The origin is also the switch that lifts noindex and fills in
+      # the canonicals, the sitemap and robots.txt -- see SITE in app/content.ts.
       - name: Build static export
         env:
-          PAGES_BASE_PATH: /${{ github.event.repository.name }}
+          NEXT_PUBLIC_SITE_ORIGIN: https://www.marshalgrc.com
         run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
