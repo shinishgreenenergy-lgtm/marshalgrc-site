@@ -47,40 +47,71 @@ test("no internal link is dead", async ({ page, baseURL }) => {
   }
 });
 
-test("the obligation index lists every framework with its domain", async ({ page }) => {
+test("every satellite comes from the services page", async ({ page }) => {
+  // The figure must not be able to claim a standard the services page does
+  // not list, so the two are read and compared rather than both trusted.
+  await page.goto("/services/");
+  const onServices = await page.locator(".svc").evaluateAll((els) =>
+    Object.fromEntries(els.map((e) => [e.id, e.querySelector(".std")!.textContent!.trim()])),
+  );
   await page.goto("/");
-  const rows = page.locator(".index-list button");
-  await expect(rows).toHaveCount(8);
-  await expect(rows.first()).toContainText("ISO 27001");
-  await expect(rows.first()).toContainText("Cybersecurity");
+  const inOrrery = await page.locator(".world").evaluateAll((els) =>
+    Object.fromEntries(
+      els.map((e) => [
+        e.getAttribute("data-domain"),
+        [...e.querySelectorAll(".moon")].map((m) => m.textContent!.trim()).join(", "),
+      ]),
+    ),
+  );
+  expect(Object.keys(inOrrery)).toHaveLength(8);
+  expect(inOrrery).toEqual(onServices);
+  expect(inOrrery["cybersecurity"]).toBe("ISO/IEC 27001, SOC 2, NIST CSF, SANS");
 });
 
-test("the control dial places every obligation on the ring", async ({ page }, info) => {
-  test.skip(info.project.name !== "desktop", "below 720px the dial becomes a ruled register");
+test("the removed claim and caption are gone from the home page", async ({ page }) => {
   await page.goto("/");
-  const stage = (await page.locator(".stage").boundingBox())!;
+  const body = (await page.locator("body").textContent()) ?? "";
+  // The exact strings, not "One control library" alone: the qualities list
+  // still says "One control library, mapped to every obligation", which is a
+  // different section and was never asked for.
+  expect(body).not.toContain("One control library, every obligation");
+  expect(body).not.toContain("Each requirement links back to one shared control");
+  await expect(page.locator(".index-claim, .index-note, .dial, .index-list")).toHaveCount(0);
+  await expect(page.locator(".sun-label")).toHaveText("GRC control library");
+});
+
+test("the orrery sets every domain on one ellipse", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "below 860px the plane folds into a register");
+  await page.goto("/");
+  const stage = (await page.locator(".orrery").boundingBox())!;
   const cx = stage.x + stage.width / 2;
   const cy = stage.y + stage.height / 2;
-  const buttons = page.locator(".index-list button");
-  await expect(buttons).toHaveCount(8);
-  const radii: number[] = [];
+  // The CSS places each domain at 39% of the width and 33.93% of the height.
+  const rx = stage.width * 0.39;
+  const ry = stage.height * 0.3393;
+  const worlds = page.locator(".world button");
+  await expect(worlds).toHaveCount(8);
+  const err: number[] = [];
   for (let i = 0; i < 8; i++) {
-    const b = (await buttons.nth(i).boundingBox())!;
-    radii.push(Math.hypot(b.x + b.width / 2 - cx, b.y + b.height / 2 - cy));
+    const b = (await worlds.nth(i).boundingBox())!;
+    const dx = (b.x + b.width / 2 - cx) / rx;
+    const dy = (b.y + b.height / 2 - cy) / ry;
+    // A CSS slip that cancels the positioning stacks all eight on the sun.
+    err.push(Math.abs(Math.hypot(dx, dy) - 1));
   }
-  // A CSS slip that cancels the positioning stacks all eight on the centre —
-  // the same failure the old lattice had, and invisible to a text assertion.
-  expect(Math.min(...radii), "labels must sit outside the hub").toBeGreaterThan(stage.width * 0.3);
-  expect(Math.max(...radii) - Math.min(...radii), "labels must sit on one circle").toBeLessThan(2);
+  expect(Math.max(...err), "every domain must sit on the ellipse").toBeLessThan(0.08);
+  // An ellipse, not a circle: the two radii must genuinely differ.
+  expect(rx / ry).toBeGreaterThan(1.3);
 });
 
-test("the dial never pushes the page sideways as it turns", async ({ page }, info) => {
-  test.skip(info.project.name !== "desktop", "the dial only turns above 720px");
-  // The ring and its labels rotate, and a rotated square reaches 1.41x its own
-  // width at 45 degrees. One scroll position cannot see that, so step through.
+test("the orrery never pushes the page sideways as it turns", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "the plane only turns above 860px");
+  // The satellites swing out past their own domain as they revolve, and the
+  // lit one is the widest thing on the page. One scroll position cannot see
+  // that, so step down the page at each width.
   // 901px is left out on purpose: the page there already overflows by 10px
   // before anything scrolls, on live as well as locally, and that is a
-  // separate pre-existing bug — not something the dial should be asserting.
+  // separate pre-existing bug -- not something this figure should assert.
   for (const width of [960, 1024, 1120, 1280, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");

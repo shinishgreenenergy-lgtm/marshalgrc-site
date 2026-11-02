@@ -59,7 +59,6 @@ export const HERO = {
     { name: "HIPAA", reach: "Data privacy and protection" },
     { name: "ISO 22301", reach: "Business continuity and disaster recovery" },
   ],
-  caption: "Each requirement links back to one shared control.",
 };
 
 export const TRIAD = {

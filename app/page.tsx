@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Seal } from "./components/Logo";
 import { Marquee } from "./components/Marquee";
-import { ObligationIndex } from "./components/ObligationIndex";
+import { ControlOrrery } from "./components/ControlOrrery";
 import { path, TRIAD, QUALITIES, PRESSURE, OFFER, ENGAGEMENT } from "./content";
 
 /** The headline, broken where it should break. Each line is masked and rises
@@ -39,7 +39,7 @@ export default function Home() {
 
       <section className="invert section">
         <div className="wrap">
-          <ObligationIndex />
+          <ControlOrrery />
         </div>
       </section>
 
