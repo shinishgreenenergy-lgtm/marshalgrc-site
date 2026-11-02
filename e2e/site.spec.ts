@@ -80,28 +80,66 @@ test("the removed claim and caption are gone from the home page", async ({ page 
   await expect(page.locator(".sun-label")).toHaveText("GRC control library");
 });
 
-test("the orrery sets every domain on one ellipse", async ({ page }, info) => {
+test("every domain rides its own orbit, widening outwards", async ({ page }, info) => {
   test.skip(info.project.name !== "desktop", "below 860px the plane folds into a register");
   await page.goto("/");
   const stage = (await page.locator(".orrery").boundingBox())!;
   const cx = stage.x + stage.width / 2;
   const cy = stage.y + stage.height / 2;
-  // The CSS places each domain at 39% of the width and 33.93% of the height.
-  const rx = stage.width * 0.39;
-  const ry = stage.height * 0.3393;
-  const worlds = page.locator(".world button");
+  const worlds = page.locator(".world");
   await expect(worlds).toHaveCount(8);
+  // The component spaces eight orbits from 148 to 452 across a 1000x560 box,
+  // each squashed to the same plane. Concentric, so the radius must grow with
+  // the index -- a slip that collapses them puts all eight on one ring.
   const err: number[] = [];
   for (let i = 0; i < 8; i++) {
+    const r = 148 + (304 * i) / 7;
+    const rx = stage.width * (r / 1000);
+    const ry = stage.height * ((r * 0.487) / 560);
     const b = (await worlds.nth(i).boundingBox())!;
     const dx = (b.x + b.width / 2 - cx) / rx;
     const dy = (b.y + b.height / 2 - cy) / ry;
-    // A CSS slip that cancels the positioning stacks all eight on the sun.
     err.push(Math.abs(Math.hypot(dx, dy) - 1));
   }
-  expect(Math.max(...err), "every domain must sit on the ellipse").toBeLessThan(0.08);
-  // An ellipse, not a circle: the two radii must genuinely differ.
-  expect(rx / ry).toBeGreaterThan(1.3);
+  expect(Math.max(...err), "every domain must sit on its own orbit").toBeLessThan(0.1);
+});
+
+test("the system turns clockwise, and only while the page moves", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "the plane only turns above 860px");
+  await page.goto("/");
+  const spin = () =>
+    page.evaluate(() =>
+      parseFloat(getComputedStyle(document.querySelector(".orrery")!).getPropertyValue("--spin")),
+    );
+  const angle = () =>
+    page.evaluate(() => {
+      const o = document.querySelector(".orrery")!.getBoundingClientRect();
+      const w = document.querySelector(".world")!.getBoundingClientRect();
+      // Screen y points down, so a rising atan2 here is a clockwise sweep.
+      return Math.atan2(
+        w.y + w.height / 2 - (o.y + o.height / 2),
+        w.x + w.width / 2 - (o.x + o.width / 2),
+      );
+    });
+
+  const height = await page.evaluate(() => document.documentElement.scrollHeight);
+  const settle = () =>
+    page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+
+  const seen: number[] = [];
+  for (const f of [0.1, 0.2, 0.3, 0.4]) {
+    await page.evaluate((y) => window.scrollTo(0, y), height * f);
+    await settle();
+    seen.push(await spin());
+  }
+  // Scroll is the clock: the angle has to advance as the section passes.
+  expect(Math.max(...seen) - Math.min(...seen), "the orrery must turn on scroll").toBeGreaterThan(5);
+  expect(seen.every((v, i) => i === 0 || v >= seen[i - 1]), "it must only ever turn one way").toBe(true);
+
+  // ...and nothing but scroll. Two reads a second apart, standing still.
+  const before = await angle();
+  await page.waitForTimeout(1000);
+  expect(await angle(), "nothing may move on a timer").toBeCloseTo(before, 4);
 });
 
 test("the orrery never pushes the page sideways as it turns", async ({ page }, info) => {

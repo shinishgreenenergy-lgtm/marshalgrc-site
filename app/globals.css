@@ -133,32 +133,38 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
 .invert a:not(.btn){color:var(--gold-pale)}
 
 /* ── Control orrery: the hero figure ────────────────────────────────────────
-   The GRC control library is the sun; the eight governance domains ride one
-   plane around it, each carrying the standards it answers to as satellites.
-   An ellipse rather than a circle: the figure is nearly twice as wide as it is
-   tall, and a ring seen at an angle is the only shape that holds eight labels
-   apart at that proportion. Every name is read off SERVICES, so the figure
-   cannot claim a standard the services page does not list. ───────────────── */
+   The GRC control library is the sun. Each governance domain holds its own
+   orbit around it, and the standards that domain answers to are its moons.
+   Eight concentric ellipses rather than circles: the figure is nearly twice as
+   wide as it is tall, and only a plane seen at an angle separates eight rings
+   at that proportion. Every name is read off SERVICES, so the figure cannot
+   claim a standard the services page does not list. ─────────────────────── */
 .orrery{position:relative;width:100%;max-width:1180px;margin-inline:auto;aspect-ratio:1000/560}
 .plane{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.plane-ring{fill:none;stroke:rgba(168,189,214,.22);stroke-width:1.5}
-.plane-spoke{stroke:rgba(168,189,214,.15);stroke-width:1;transition:stroke .3s ease}
-.plane-spoke.on{stroke:var(--gold-pale)}
+.orbit{fill:none;stroke:rgba(168,189,214,.18);stroke-width:1;
+       transition:stroke .3s ease,stroke-width .3s ease}
+/* The lit domain's own path, so it is obvious which ring the world is riding. */
+.orbit.on{stroke:rgba(250,243,170,.55);stroke-width:1.5}
 
 /* The sun. The shield is the product's own mark, so the centre of the figure
    and the centre of the brand are the same object. */
-.sun-disc{fill:var(--field-2);stroke:rgba(156,121,69,.55);stroke-width:1.5}
-.sun{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;
-     width:22.4%;aspect-ratio:1;display:grid;place-content:center;place-items:center;
-     text-align:center;padding:0 4%}
-.sun::before{content:"";position:absolute;inset:-34%;border-radius:50%;z-index:-1;
-             background:radial-gradient(circle,rgba(156,121,69,.3),rgba(156,121,69,0) 68%)}
-.sun-mark{width:clamp(3.2rem,7.2vw,5.8rem);aspect-ratio:1;display:block}
+/* The disc belongs to the sun element, not to the SVG plane. In the plane it
+   paints before .worlds, so a named moon crossing the middle of the figure
+   rode over the sun and over its label. Here the sun is one object that sits
+   above the system, and a moon passing behind it is properly hidden — which
+   is what an orrery does anyway. */
+.sun{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:40;
+     width:16.4%;aspect-ratio:1;display:grid;place-content:center;place-items:center;
+     text-align:center;padding:0 3%}
+.sun::before{content:"";position:absolute;inset:0;border-radius:50%;z-index:-1;
+             background:radial-gradient(circle at 38% 32%,#235283,#15406C 62%,#0C2847 100%);
+             border:2px solid rgba(192,152,89,.8)}
+.sun-mark{width:clamp(2.8rem,6vw,4.8rem);aspect-ratio:1;display:block}
 .mark-shield{fill:none;stroke:var(--gold);stroke-width:5;stroke-linejoin:round}
 .mark-shackle{fill:none;stroke:var(--gold);stroke-width:7;stroke-linecap:round}
 .mark-bar{stroke:var(--field-ink-2);stroke-width:7;stroke-linecap:round}
 .sun-label{margin:.3rem 0 0;font-family:var(--display);font-weight:600;line-height:1.25;
-           font-size:clamp(.74rem,1.06vw,.98rem);color:var(--field-ink)}
+           font-size:clamp(.7rem,.95vw,.9rem);color:var(--field-ink)}
 
 /* --lit is how lit a domain is, 0 to 1. One number drives the zoom, the
    colour and the satellites, so the scroll sweep and the pointer can both
@@ -166,48 +172,99 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
 @property --lit{syntax:"<number>";initial-value:0;inherits:true}
 @property --spin{syntax:"<angle>";initial-value:0deg;inherits:true}
 
+/* Every world shares one --spin, so the whole system keeps its angular
+   spacing however far it has travelled. That is what makes a frame mid-scroll
+   as legible as the first one: eight labels that never converge, because the
+   gaps between them cannot change. The solar-system read comes from the moons,
+   which run several times faster than the worlds they belong to. */
 .worlds{list-style:none;margin:0;padding:0;position:absolute;inset:0}
-.world{position:absolute;left:calc(50% + var(--x) * 39%);top:calc(50% + var(--y) * 33.93%);
-       transform:translate(-50%,-50%);z-index:calc(var(--z) + var(--lit) * 20)}
+.world{--a:calc(var(--base) + var(--spin));
+       /* Depth, from the live angle rather than a fixed number: the bottom of
+          an ellipse reads as nearest, so a world that has travelled to the
+          back must actually shrink and fade on the way. */
+       --near:calc(.5 + sin(var(--a)) * .5);
+       position:absolute;
+       left:calc(50% + var(--rx) * cos(var(--a)));
+       top:calc(50% + var(--ry) * sin(var(--a)));
+       transform:translate(-50%,-50%);z-index:calc(10 + var(--lit) * 20)}
 .world.on{--lit:1}
 .world button{background:none;border:0;cursor:pointer;font:inherit;padding:6px 10px;
               display:grid;justify-items:center;white-space:nowrap;
-              gap:calc(.45rem + var(--lit) * .55rem);transition:gap .4s ease;
-              font-size:clamp(.78rem,1.05vw,.95rem);font-weight:500;color:var(--field-ink);
-              opacity:calc(.6 + var(--near) * .4 + var(--lit) * .4);transition:opacity .3s ease}
+              gap:calc(.4rem + var(--lit) * .5rem);
+              font-size:clamp(.74rem,1vw,.92rem);font-weight:500;color:var(--field-ink);
+              opacity:calc(.55 + var(--near) * .45);
+              scale:calc(.88 + var(--near) * .12 + var(--lit) * .16);
+              transition:gap .4s ease,scale .4s ease}
 .world button:focus-visible{outline:2px solid var(--gold-pale);outline-offset:3px}
-.world-body{display:block;width:calc(11px + var(--near) * 8px);aspect-ratio:1;border-radius:50%;
-            background:var(--field-ink-2);scale:calc(1 + var(--lit) * 1.6);
-            transition:scale .4s ease,background .3s ease,box-shadow .3s ease}
-.world.on .world-body{background:var(--gold-pale);box-shadow:0 0 18px rgba(250,243,170,.45)}
+/* A lit limb rather than a flat fill, so the body reads as a sphere caught by
+   the sun at the centre instead of a dot on a line. */
+.world-body{display:block;width:var(--body);aspect-ratio:1;border-radius:50%;
+            background:radial-gradient(circle at 32% 30%,
+              color-mix(in oklab,var(--field-ink) 85%,var(--gold-pale)),
+              var(--field-ink-2) 62%,
+              color-mix(in oklab,var(--field-ink-2) 55%,var(--field)) 100%);
+            scale:calc(1 + var(--lit) * .9);
+            transition:scale .4s ease,box-shadow .3s ease}
+.world.on .world-body{box-shadow:0 0 18px rgba(250,243,170,.5);
+                      background:radial-gradient(circle at 32% 30%,#fff,
+                        var(--gold-pale) 58%,var(--gold) 100%)}
 .world-name{color:color-mix(in oklab,var(--field-ink),var(--gold-pale) calc(var(--lit) * 100%))}
 
-/* Satellites. Position comes from trigonometry on an animated angle, so they
-   revolve in the plane instead of the whole ring tumbling, and the labels
-   never need counter-rotating to stay upright. */
+/* Moons. Position is trigonometry on an angle that runs several times the
+   world's own, so each domain visibly carries its standards round itself
+   while the whole system turns. The dot is always drawn; the name waits to be
+   asked for, because twenty-four labels at once is not a diagram. */
 .moons{list-style:none;margin:0;padding:0;position:absolute;left:50%;top:50%;
-       width:clamp(9.5rem,16vw,14.5rem);height:clamp(6.6rem,9.6vw,8.8rem);
-       transform:translate(-50%,calc(-50% - 1.1em));pointer-events:none;
-       opacity:var(--lit);transition:opacity .35s ease}
-.moon{position:absolute;transform:translate(-50%,-50%);
-      left:calc(50% + 50% * cos(var(--spin,0deg) + var(--m) * 1turn));
-      top:calc(50% + 50% * sin(var(--spin,0deg) + var(--m) * 1turn))}
+       width:0;height:0;pointer-events:none;z-index:-1}
+/* Lit, a domain's moons swing wide. At rest they are beads tucked against
+   their world; named, they need room to be read, and a pill is twenty times
+   the width of the bead it replaces. Widening the orbit is what buys that
+   room — the alternative is five labels stacked on one planet. */
+.moon{--mrl:calc(var(--mr) * (1 + var(--lit) * 1.8));
+      position:absolute;
+      left:calc(var(--mrl) * cos(calc(var(--spin) * 3.4) + var(--m) * 1turn));
+      top:calc(var(--mrl) * sin(calc(var(--spin) * 3.4) + var(--m) * 1turn));
+      transform:translate(-50%,-50%);
+      scale:calc(.7 + var(--near) * .3);
+      transition:left .4s ease,top .4s ease}
+/* The moon itself: a bead, always visible. */
+.moon::before{content:"";position:absolute;left:50%;top:50%;width:4px;height:4px;
+              border-radius:50%;transform:translate(-50%,-50%);
+              background:var(--gold-pale);opacity:calc(.45 + var(--near) * .35);
+              box-shadow:0 0 6px rgba(250,243,170,.35)}
+.world.on .moon::before{opacity:1;width:5px;height:5px}
 .moon span{display:block;white-space:nowrap;padding:3px 9px;border-radius:999px;
-           font-size:clamp(.64rem,.86vw,.78rem);font-weight:500;
-           color:var(--field);background:var(--gold-pale)}
+           font-size:clamp(.62rem,.82vw,.76rem);font-weight:500;
+           transform:translate(-50%,-50%) translateY(-14px);
+           color:var(--field);background:var(--gold-pale);
+           opacity:var(--lit);transition:opacity .35s ease}
 
 /* ── The orrery turns ───────────────────────────────────────────────────────
-   Scroll-driven, never timed: the satellites revolve only while the page
-   moves, and each domain takes its turn in front as the section passes. With
-   no view() support the figure is still complete — hovering, tapping or
-   tabbing a domain lights it and brings its satellites up. ───────────────── */
+   Scroll-driven, never timed. One timeline on the figure itself, not on the
+   page: a page-length timeline would spend only a fraction of a turn while
+   this section is actually on screen, which looks like nothing moving at all.
+   Everything clockwise — with the y axis pointing down, a rising angle through
+   cos/sin runs right, then down, then left.
+
+   With no view() support the figure is still complete and still correct:
+   hovering, tapping or tabbing a domain lights it and names its moons. ──── */
 @supports (animation-timeline:view()){
   @media (prefers-reduced-motion:no-preference){
-    .orrery{animation:orbit-spin linear both;animation-timeline:scroll(root block)}
+    .orrery{view-timeline:--orrery block;
+            animation:orbit-spin linear both;
+            animation-timeline:--orrery;
+            animation-range:entry 0% exit 100%}
     @keyframes orbit-spin{to{--spin:1turn}}
 
-    .orrery[data-mode="sweep"] .world{animation:take-focus linear both;animation-timeline:view(block)}
+    /* Each domain takes its turn in front as the section passes. Driven by the
+       same timeline, not each world's own view(): once a world is travelling,
+       its own view progress depends on where it has got to. */
+    .orrery[data-mode="sweep"] .world{animation:take-focus linear both;
+                                      animation-timeline:--orrery;
+                                      animation-range:entry 0% exit 100%}
     @keyframes take-focus{0%,100%{--lit:0}42%,58%{--lit:1}}
+    /* cover 0% and 100% are the same two instants as entry 0% and exit 100%,
+       so these eight windows divide the one pass the system turns over. */
     .orrery[data-mode="sweep"] .world:nth-child(1){animation-range:cover 2% cover 18%}
     .orrery[data-mode="sweep"] .world:nth-child(2){animation-range:cover 14% cover 30%}
     .orrery[data-mode="sweep"] .world:nth-child(3){animation-range:cover 26% cover 42%}
@@ -219,8 +276,8 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
   }
 }
 
-/* Eight labels and their satellites cannot share an ellipse at phone width,
-   so the plane folds into a register. Same markup, no second component. */
+/* Eight orbits and their moons cannot share a plane at phone width, so the
+   figure folds into a register. Same markup, no second component. */
 @media (max-width:860px){
   .orrery{aspect-ratio:auto;max-width:34rem}
   .orrery[data-mode="sweep"] .world{animation:none}
@@ -228,16 +285,21 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
   /* The disc is a desktop device. Left on, its glow is positioned against
      .orrery and hangs a third of the figure off both edges of the phone. */
   .sun{position:static;transform:none;width:auto;aspect-ratio:auto;padding:0;margin:0 auto 26px}
-  .sun::before{display:none}
   .sun-mark{width:clamp(4.5rem,22vw,6rem)}
+  /* The sun goes static here, so its disc would resolve against .orrery and
+     cover the whole register. There is no plane to be the centre of anyway. */
+  .sun::before{display:none}
   .worlds{position:static}
-  .world{position:static;transform:none;z-index:auto;border-top:1px solid rgba(234,240,248,.16)}
+  .world{position:static;transform:none;z-index:auto;--near:1;
+         border-top:1px solid rgba(234,240,248,.16)}
   .world button{width:100%;display:flex;align-items:center;gap:.6rem;padding:14px 2px 8px;
-                opacity:1;font-size:1rem}
+                opacity:1;scale:1;font-size:1rem}
   .world-body{scale:1;width:10px}
-  .moons{position:static;width:auto;height:auto;transform:none;opacity:1;
+  .moons{position:static;width:auto;height:auto;z-index:auto;
          display:flex;flex-wrap:wrap;gap:6px;padding:0 2px 16px 24px}
-  .moon{position:static;transform:none}
+  .moon{position:static;transform:none;scale:1}
+  .moon::before{display:none}
+  .moon span{transform:none;opacity:1}
 }
 
 /* ── Triad ──────────────────────────────────────────────────────────────── */

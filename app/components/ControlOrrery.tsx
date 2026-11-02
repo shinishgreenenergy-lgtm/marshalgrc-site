@@ -6,59 +6,80 @@ import { SERVICES } from "../content";
 /**
  * The hero figure: an orrery of obligations.
  *
- * The claim is one control set, so the GRC control library is the sun and the
- * eight governance domains ride one shared plane around it. Each domain's
- * satellites are the standards it answers to, read straight off SERVICES — the
- * figure cannot claim a standard the services page does not already list.
+ * The claim is one control set, so the GRC control library is the sun and each
+ * governance domain holds its own orbit around it. The standards a domain
+ * answers to are its moons, read straight off SERVICES — the figure cannot
+ * claim a standard the services page does not already list.
  *
- * Nothing moves on a timer. The satellites revolve with the scroll and each
- * domain takes its turn in front as the section passes, which is the motion
- * idiom the rest of the site uses and keeps this clear of WCAG 2.2.2.
+ * Everything travels clockwise. Nothing moves on a timer: the whole system is
+ * driven by the section's own passage through the viewport, so it is still
+ * whenever the reader is, which is what keeps a domain clickable and keeps
+ * this clear of WCAG 2.2.2.
  */
 
-/* The plane is drawn in a 1000x560 box, so an ellipse rather than a circle:
-   a ring seen at an angle, which is what lets eight labels sit apart on a
-   figure that is far wider than it is tall. */
+/* Drawn in a 1000x560 box, so every orbit is an ellipse rather than a circle:
+   a plane seen at an angle. Eight concentric rings only separate at that
+   proportion — on a circle the outer ones would crowd the top and bottom. */
 const VW = 1000;
 const VH = 560;
 const CX = VW / 2;
 const CY = VH / 2;
-const RX = 390;
-const RY = 190;
+/** The sun's disc. Orbits start clear of it, not inside it. */
+const SUN_R = 82;
+/** Innermost and outermost orbit, in viewBox units across. */
+const R0 = 148;
+const R1 = 452;
+/** Every orbit keeps the plane's own squash, so they read as one system. */
+const TILT = 0.487;
 
-const STEP = 360 / SERVICES.length;
 const r2 = (n: number) => Number(n.toFixed(3));
+const N = SERVICES.length;
 
 const WORLDS = SERVICES.map((s, i) => {
-  // 90deg is the front of the plane, so the first domain leads at the bottom
-  // and the ring reads anticlockwise from there.
-  const t = ((i * STEP + 90) * Math.PI) / 180;
-  const x = Math.cos(t);
-  const y = Math.sin(t);
+  /** Semi-major axis of this domain's orbit, in viewBox units across. */
+  const a = R0 + ((R1 - R0) * i) / (N - 1);
+  /* Eccentricity falls away outward, so the innermost domain is the one with
+     the Mercury-like path: a ring visibly off to one side, tight against the
+     sun at perihelion and long away from it at aphelion. Circles all sharing
+     a centre are a dartboard; this is a solar system. */
+  const e = 0.24 - (0.2 * i) / (N - 1);
+  /** Semi-minor follows from the eccentricity, then takes the plane's tilt. */
+  const rx = a;
+  const ry = a * Math.sqrt(1 - e * e) * TILT;
+  /* The sun sits at a focus, not at the centre, so the orbit's own centre is
+     displaced by a*e away from perihelion. Each orbit points its perihelion
+     somewhere different, which is what stops eight rings nesting tidily. */
+  const peri = (i * 47 * Math.PI) / 180;
+  const ox = -a * e * Math.cos(peri);
+  const oy = -a * e * Math.sin(peri) * TILT;
+  /** The standards line off the services page, split — never retyped here. */
+  const moons = s.standards.split(",").map((m) => m.trim()).filter(Boolean);
+  const body = r2(17 + moons.length * 2.4);
   return {
     id: s.id,
     name: s.short,
     title: s.title,
-    /** The services page's own standards line, split — never retyped here. */
-    moons: s.standards.split(",").map((m) => m.trim()).filter(Boolean),
-    x: r2(x),
-    y: r2(y),
-    /** The bottom of the ellipse reads as nearest the viewer. */
-    near: r2((y + 1) / 2),
-    z: Math.round(((y + 1) / 2) * 10),
-    sx: r2(CX + RX * x),
-    sy: r2(CY + RY * y),
+    moons,
+    rx: r2(rx),
+    ry: r2(ry),
+    ox: r2(ox),
+    oy: r2(oy),
+    /** As a share of the figure, because the figure is fluid and the box is not. */
+    rxp: r2((rx / VW) * 100),
+    ryp: r2((ry / VH) * 100),
+    oxp: r2((ox / VW) * 100),
+    oyp: r2((oy / VH) * 100),
+    /* Spread evenly round the dial and offset off the horizontal, so the
+       static frame — reduced motion, and any browser without view() — has its
+       eight labels apart rather than stacked along one axis. */
+    base: r2(i * (360 / N) + 22),
+    /** A bigger world for a domain answering to more standards. */
+    body,
+    /** How close to the sun, 1 to 0 — the inner worlds run hot, the outer cold. */
+    heat: r2(1 - i / (N - 1)),
+    /** Moons ride clear of their own world, which is now a real sphere. */
+    mr: r2(body / 2 + 24 + moons.length * 2.2),
   };
-});
-
-/** Spokes start at the sun's edge, not its centre, so none of them crosses
- *  the label inside it. */
-const SUN_R = 112;
-const SPOKES = WORLDS.map((w) => {
-  const dx = w.sx - CX;
-  const dy = w.sy - CY;
-  const k = (SUN_R + 8) / Math.hypot(dx, dy);
-  return { id: w.id, x1: r2(CX + dx * k), y1: r2(CY + dy * k), x2: w.sx, y2: w.sy };
 });
 
 export function ControlOrrery() {
@@ -73,18 +94,27 @@ export function ControlOrrery() {
     // pointer always wins over the animation rather than fighting it.
     <div className="orrery" data-mode={active ? "held" : "sweep"}>
       <svg className="plane" viewBox={`0 0 ${VW} ${VH}`} aria-hidden="true">
-        <ellipse className="plane-ring" cx={CX} cy={CY} rx={RX} ry={RY} pathLength={1} />
-        {SPOKES.map((s) => (
-          <line
-            key={s.id}
-            className={`plane-spoke${active === s.id ? " on" : ""}`}
-            x1={s.x1}
-            y1={s.y1}
-            x2={s.x2}
-            y2={s.y2}
+        <defs>
+          {/* The corona does the work of making this read as a sun rather than
+              a very large planet: the disc itself has to stay dark enough for
+              the mark and the label to sit on it. */}
+          <radialGradient id="corona">
+            <stop offset="34%" stopColor="rgba(156,121,69,.55)" />
+            <stop offset="58%" stopColor="rgba(156,121,69,.22)" />
+            <stop offset="100%" stopColor="rgba(156,121,69,0)" />
+          </radialGradient>
+        </defs>
+        {WORLDS.map((w) => (
+          <ellipse
+            key={w.id}
+            className={`orbit${active === w.id ? " on" : ""}`}
+            cx={CX}
+            cy={CY}
+            rx={w.rx}
+            ry={w.ry}
           />
         ))}
-        <circle className="sun-disc" cx={CX} cy={CY} r={SUN_R} />
+        <circle className="corona" cx={CX} cy={CY} r={SUN_R * 3.1} fill="url(#corona)" />
       </svg>
 
       <div className="sun">
@@ -107,7 +137,15 @@ export function ControlOrrery() {
               key={w.id}
               className={`world${on ? " on" : ""}`}
               data-domain={w.id}
-              style={{ "--x": w.x, "--y": w.y, "--near": w.near, "--z": w.z } as React.CSSProperties}
+              style={
+                {
+                  "--base": `${w.base}deg`,
+                  "--rx": `${w.rxp}%`,
+                  "--ry": `${w.ryp}%`,
+                  "--body": `${w.body}px`,
+                  "--mr": `${w.mr}px`,
+                } as React.CSSProperties
+              }
             >
               <button
                 type="button"
@@ -123,7 +161,9 @@ export function ControlOrrery() {
               </button>
 
               {/* Always in the document, so the standards are readable to a
-                  screen reader whether or not the domain is the one lit. */}
+                  screen reader whether or not the domain is the one lit. The
+                  moon itself is always drawn; only its name waits to be asked
+                  for, because twenty-four names at once is not a diagram. */}
               <ul className="moons">
                 {w.moons.map((m, j) => (
                   <li
