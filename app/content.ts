@@ -363,3 +363,20 @@ export const CONTACT = {
     ],
   },
 };
+
+/**
+ * The cookie notice, and the word on the button back to the top.
+ *
+ * The copy says what is actually true, because /privacy already says it in
+ * plainer words: this site sets no cookies and loads nothing from anyone else.
+ * A GRC firm promising an audit trail cannot be the one running a banner that
+ * claims a tracking stack it does not have.
+ */
+export const NOTICE = {
+  heading: "Cookies",
+  body: "This site sets no cookies, runs no analytics and loads nothing from another company. Agreeing stores one line in your browser so the notice stays shut; declining stores nothing at all, so it will be here again next visit.",
+  agree: "Agree",
+  decline: "Decline",
+  more: "Privacy",
+  toTop: "Back to top",
+};

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Poppins, Geist } from "next/font/google";
 import { SiteHeader } from "./components/SiteHeader";
 import { SiteFooter } from "./components/SiteFooter";
-import { SITE } from "./content";
+import { CookieNotice } from "./components/CookieNotice";
+import { NOTICE, SITE } from "./content";
 import "./globals.css";
 
 // Both faces are the ones the Stellar Marshal product already ships, so the
@@ -72,6 +73,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
         <main id="main">{children}</main>
         <SiteFooter />
+        {/* "#top" needs no element of its own: with nothing matching, the
+            browser scrolls to the top of the document, which is the whole
+            behaviour wanted. No script, and it still works without one. */}
+        <a className="to-top" href="#top">
+          <span aria-hidden="true">↑</span> {NOTICE.toTop}
+        </a>
+        <CookieNotice />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

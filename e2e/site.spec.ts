@@ -74,6 +74,26 @@ test("the control dial places every obligation on the ring", async ({ page }, in
   expect(Math.max(...radii) - Math.min(...radii), "labels must sit on one circle").toBeLessThan(2);
 });
 
+test("the dial never pushes the page sideways as it turns", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "the dial only turns above 720px");
+  // The ring and its labels rotate, and a rotated square reaches 1.41x its own
+  // width at 45 degrees. One scroll position cannot see that, so step through.
+  for (const width of [901, 1024, 1120, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const height = await page.evaluate(() => document.documentElement.scrollHeight);
+    for (let i = 0; i <= 12; i++) {
+      await page.evaluate((y) => window.scrollTo(0, y), (height * i) / 12);
+      const over = await page.evaluate(async () => {
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        const d = document.documentElement;
+        return d.scrollWidth - d.clientWidth;
+      });
+      expect(over, `${width}px wide, ${i}/12 down the page`).toBeLessThanOrEqual(0);
+    }
+  }
+});
+
 test("the hero headline is readable with motion switched off", async ({ browser }) => {
   // The juror test: kill the motion and the static frame must still hold.
   // toBeVisible() passes on a stuck reveal, so assert the settled position.

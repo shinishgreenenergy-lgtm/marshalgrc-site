@@ -58,10 +58,13 @@ export default function PrivacyPage() {
           <h2>Hosting and server logs</h2>
           <p>
             These pages are served by GitHub Pages. Like most web servers it records
-            requests, which typically includes IP addresses; GitHub&apos;s own privacy
-            statement covers that processing. The retention period is{" "}
-            <span className="todo">[to be confirmed]</span>, and this section must be
-            updated if the site moves to different hosting.
+            requests, which typically includes IP addresses; GitHub&apos;s own{" "}
+            <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">
+              privacy statement
+            </a>{" "}
+            covers that processing. GitHub sets how long those logs are kept, not us, and
+            we are never sent a copy of them. This section must be updated if the site
+            moves to different hosting.
           </p>
 
           <h2>Your rights</h2>
@@ -73,16 +76,17 @@ export default function PrivacyPage() {
           </p>
           <p>
             The data controller for enquiries sent to that address is {SITE.parent},
-            Visakhapatnam, India. The registered entity details and the supervisory
-            authority that applies are{" "}
-            <span className="todo">[to be confirmed before launch]</span>.
+            Visakhapatnam, Andhra Pradesh, India. Personal data sent to us is handled
+            under India&apos;s Digital Personal Data Protection Act 2023; the Data
+            Protection Board of India, which that Act establishes, is still being
+            constituted. If you are in the EEA or the UK, you may also raise a complaint
+            with your own supervisory authority.
           </p>
 
           <h2>Changes</h2>
           <p>
             Any change to this notice replaces the version on this page. This page has not
-            yet been reviewed by a legal adviser; the flagged items above are the ones that
-            need confirming first.
+            yet been reviewed by a legal adviser.
           </p>
         </div>
       </div>

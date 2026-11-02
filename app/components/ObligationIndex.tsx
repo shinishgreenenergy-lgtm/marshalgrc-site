@@ -18,7 +18,7 @@ import { HERO } from "../content";
 const VIEW = 200;
 const C = VIEW / 2;
 const RING = 72;
-const HUB = 38;
+const HUB = 42;
 const STEP = 360 / HERO.frameworks.length;
 const GAP = 5; // degrees trimmed off each end of a domain arc
 
@@ -72,7 +72,6 @@ export function ObligationIndex() {
           <svg className="dial" viewBox={`0 0 ${VIEW} ${VIEW}`} aria-hidden="true">
             <circle className="dial-base" cx={C} cy={C} r={RING} />
             <circle className="dial-hub" cx={C} cy={C} r={HUB} />
-            <circle className="dial-hub inner" cx={C} cy={C} r={HUB - 4} />
 
             {BANDS.map((b) => (
               <path
@@ -103,7 +102,18 @@ export function ObligationIndex() {
             })}
           </svg>
 
-          <p className="hub-label">Control library</p>
+          <svg className="dial-mark" viewBox={`0 0 ${VIEW} ${VIEW}`} aria-hidden="true">
+            {/* The shield from the Stellar Marshal mark: gold shackle over
+                three bars. It sits outside the rotating group, so the hub
+                holds still while the ring turns. */}
+            <g transform={`translate(${C} 82) scale(.3)`}>
+              <path className="mark-shield" d="M0 -52 L46 -36 V2 C46 27 26 45 0 53 C-26 45 -46 27 -46 2 V-36 Z" />
+              <path className="mark-shackle" d="M-15 0 V-13 A15 15 0 0 1 15 -13 V0" />
+              <path className="mark-bar" d="M-26 6 H26 M-26 20 H26 M-26 34 H26" />
+            </g>
+          </svg>
+
+          <p className="hub-label">GRC control library</p>
           </div>
 
           <ul className="index-list">
