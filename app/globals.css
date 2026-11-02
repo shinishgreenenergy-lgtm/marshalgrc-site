@@ -132,25 +132,110 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
 .invert p,.invert .lede,.invert .phases p,.invert .flow p,.invert .sub{color:var(--field-ink-2)}
 .invert a:not(.btn){color:var(--gold-pale)}
 
-/* ── Obligation index: the hero figure, rebuilt as type ─────────────────── */
-.index-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(32px,5vw,72px);align-items:center}
+/* ── Control dial: the hero figure ──────────────────────────────────────────
+   Eight obligations on one ring around one hub, because the claim is one
+   control set. The ring is split into arcs by governance domain, so the
+   grouping in content.ts is something you can see rather than something the
+   copy asserts. ─────────────────────────────────────────────────────────── */
+.index-grid{display:grid;grid-template-columns:minmax(0,22rem) minmax(0,1fr);gap:clamp(32px,5vw,64px);align-items:center}
 .index-claim{font-family:var(--display);font-size:clamp(2rem,4.4vw,3.4rem);line-height:1;font-weight:600;
   letter-spacing:-.03em;margin:0 0 18px;max-width:11ch}
 .index-claim em{font-style:normal;color:var(--gold-pale)}
-.index-note{color:var(--field-ink-2);font-size:1rem;max-width:34ch;margin:0}
-.index-list{list-style:none;margin:0;padding:0;border-top:1px solid rgba(234,240,248,.18)}
-.index-list li{border-bottom:1px solid rgba(234,240,248,.18)}
-.index-list button{width:100%;display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;
-  background:none;border:0;padding:15px 0;min-height:44px;cursor:pointer;text-align:left;color:var(--field-ink);
-  font:500 clamp(1.05rem,1.8vw,1.35rem)/1.2 var(--display);letter-spacing:-.02em;position:relative}
-.index-list button::before{content:"";position:absolute;left:-100vw;right:100%;top:50%;height:1px;
-  background:var(--gold);opacity:0;transition:opacity .2s ease}
-.index-list button:hover::before,.index-list button:focus-visible::before{opacity:.9}
-.index-list .reach{font:400 .88rem var(--body);color:var(--field-ink-2);text-align:right;
-  transition:color .2s ease}
-.index-list button:hover .reach,.index-list button:focus-visible .reach{color:var(--gold-pale)}
-.index-list button:hover,.index-list button:focus-visible{color:var(--gold-pale)}
-@media (max-width:900px){.index-grid{grid-template-columns:1fr}}
+.index-note{color:var(--field-ink-2);font-size:1rem;max-width:34ch;margin:0;min-height:3.2em}
+
+.orbit{width:100%;max-width:700px;margin-inline:auto;display:grid;place-items:center}
+.stage{position:relative;width:76%;aspect-ratio:1}
+.dial-box{position:absolute;inset:0}
+.dial{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.dial-base{fill:none;stroke:rgba(168,189,214,.2)}
+.dial-hub{fill:none;stroke:rgba(168,189,214,.45);stroke-width:1.5}
+.dial-hub.inner{stroke:rgba(168,189,214,.2);stroke-width:1}
+.dial-arc{fill:none;stroke:var(--gold);stroke-width:4;opacity:.85;
+  transition:stroke .25s ease,stroke-width .25s ease,opacity .25s ease}
+.dial-arc.on{stroke:var(--gold-pale);stroke-width:5.5;opacity:1}
+.dial-tick{stroke:rgba(168,189,214,.4);stroke-width:1}
+.dial-spoke{stroke:rgba(168,189,214,.26);stroke-width:1;transition:stroke .25s ease}
+.dial-bead{fill:var(--field);stroke:rgba(168,189,214,.5);stroke-width:1.5;
+  transition:fill .2s ease,stroke .2s ease}
+.dial g.on .dial-spoke{stroke:var(--gold-pale)}
+.dial g.on .dial-bead{fill:var(--gold-pale);stroke:var(--gold-pale)}
+.hub-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;width:26%;
+  text-align:center;color:var(--field-ink);font:600 clamp(.78rem,1.5vw,1rem)/1.2 var(--display);
+  letter-spacing:-.02em;text-wrap:balance}
+
+.index-list{list-style:none;margin:0;padding:0;--lr:51%}
+.index-list li{position:absolute;left:calc(50% + var(--lr) * var(--x));top:calc(50% + var(--lr) * var(--y));
+  transform:translate(-50%,-50%)}
+.index-list button{background:none;border:0;cursor:pointer;color:var(--field-ink);white-space:nowrap;
+  padding:11px 10px;min-height:44px;font:500 clamp(.9rem,1.35vw,1.15rem)/1.2 var(--display);
+  letter-spacing:-.02em;transition:color .2s ease}
+.index-list button.on{color:var(--gold-pale)}
+.index-list .reach{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%)}
+
+/* The ring draws itself as the section arrives — scroll-driven, never timed,
+   and absent entirely when motion is unsupported or unwanted. */
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    .dial-arc{stroke-dasharray:1;animation:draw-arc linear both;
+      animation-timeline:view();animation-range:entry 15% cover 35%}
+    @keyframes draw-arc{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+  }
+}
+@media (max-width:900px){.index-grid{grid-template-columns:1fr}.orbit{max-width:560px}}
+
+/* ── The dial turns ──────────────────────────────────────────────
+   The claim is one library at the centre with every obligation bound to it, so
+   the figure behaves like a system in orbit: the hub holds still while the
+   ring it carries — arcs, ticks, spokes, beads, and the labels that name them
+   — revolves around it as the section crosses the viewport. The labels
+   counter-rotate so they stay upright and stay level with their own bead;
+   losing that pairing would break the one thing the dial is for.
+
+   A single turn, and exactly one: the ring ends where it started, so once the
+   section has passed everything is back in register. Scroll is the clock, so
+   nothing moves on its own and the ring is still whenever the reader is —
+   which is what keeps a label clickable, and what keeps this on the right side
+   of WCAG 2.2.2. Below 720px there is no dial at all; the same markup is a
+   ruled register, and none of this applies. ─────────────────────────── */
+@property --a{syntax:"<angle>";inherits:true;initial-value:0deg}
+/* The list has to be the box the labels orbit in, not a static wrapper: its
+   items already measure against the stage, and inset:0 makes it that same box
+   so their positions do not shift by a pixel. */
+.index-list{position:absolute;inset:0}
+.dial,.index-list{rotate:var(--a)}
+.index-list button{rotate:calc(-1 * var(--a))}
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    /* One angle, animated once on the stage and inherited by everything that
+       has to agree with it. The shorthand resets the timeline, so it is
+       written before animation-timeline. */
+    .stage{animation:revolve linear both;animation-timeline:view();animation-range:entry 5% exit 95%}
+    @keyframes revolve{to{--a:360deg}}
+  }
+}
+@media (max-width:719px){
+  .index-list{position:static}
+  .dial,.index-list,.index-list button{rotate:none}
+}
+
+/* Eight horizontal labels cannot clear the ring on a phone without shrinking
+   the dial to a token. Below 720px the same markup becomes the register it
+   describes: dial hidden, obligations ruled, domain shown rather than
+   revealed. No second DOM, so nothing can drift between the two. */
+@media (max-width:719px){
+  /* The dial stays — it is the point of the section — but shrinks to a mark
+     above the register, which carries the names a ring this size cannot. */
+  .dial-box{position:relative;width:min(240px,62%);aspect-ratio:1;margin:0 auto 32px}
+  .stage{position:static;width:100%;aspect-ratio:auto}
+  .index-list{border-top:1px solid rgba(234,240,248,.18)}
+  .index-list li{position:static;transform:none;border-bottom:1px solid rgba(234,240,248,.18)}
+  .index-list button{width:100%;display:grid;grid-template-columns:1fr auto;align-items:center;
+    gap:16px;padding:15px 0;text-align:left;font-size:1.05rem}
+  .index-list .reach{position:static;width:auto;height:auto;margin:0;clip-path:none;
+    font:400 .85rem var(--body);color:var(--field-ink-2);text-align:right;white-space:normal}
+  .index-list button.on .reach{color:var(--gold-pale)}
+  .index-note{min-height:0}
+}
 
 /* ── Triad ──────────────────────────────────────────────────────────────── */
 /* ── The triad: one register, three bays ────────────────────────────────────
@@ -201,6 +286,16 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
 .qlist .tick path{stroke:var(--gold);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .qlist h3{font-size:1.15rem;margin-bottom:5px}
 .qlist p{margin:0;color:var(--ink-2);font-size:1rem}
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    /* Each tick is struck as its own row arrives — the hero seal's gesture
+       borrowed, because this list is a set of things checked off. The dash is
+       set only inside the keyframes, so a browser without view() shows a
+       finished tick rather than an empty box. */
+    .qlist .tick path{animation:check linear both;animation-timeline:view();animation-range:entry 25% entry 80%}
+    @keyframes check{from{stroke-dasharray:24;stroke-dashoffset:24}to{stroke-dasharray:24;stroke-dashoffset:0}}
+  }
+}
 
 /* ── Notes / reports: card-free, ruled pairs ────────────────────────────── */
 .notes,.reports{display:grid;grid-template-columns:repeat(2,1fr);gap:0 clamp(28px,4vw,56px)}
@@ -223,16 +318,28 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
 
 /* ── Stages and steps: a real sequence, so numerals are earned ──────────── */
 .phases{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,3vw,40px)}
-.phases li{border-top:3px solid var(--gold);padding-top:22px}
+.phases li{position:relative;padding-top:22px}
+/* A bar rather than a border, so it can be drawn on. At rest, and wherever
+   view() is unsupported, it is the same 3px gold line it has always been. */
+.phases li::before{content:"";position:absolute;inset:0 0 auto;height:3px;
+  background:var(--gold);transform-origin:left}
 .phases .num{font-family:var(--display);font-weight:600;font-size:2.4rem;line-height:1;color:var(--gold);
   display:block;margin-bottom:14px;letter-spacing:-.04em}
 .phases h3{font-size:1.2rem;margin-bottom:10px}
 .phases p{margin:0;color:var(--ink-2);font-size:1rem}
 .phases .deliv{margin-top:16px;padding-top:14px;border-top:1px solid var(--rule);color:var(--ink);font-size:.95rem}
-.invert .phases li{border-top-color:var(--gold-pale)}
+.invert .phases li::before{background:var(--gold-pale)}
 .invert .phases .num{color:var(--gold-pale)}
 .invert .phases .deliv{color:var(--field-ink);border-top-color:rgba(234,240,248,.18)}
 @media (max-width:900px){.phases{grid-template-columns:1fr;gap:28px}}
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    /* Three timelines, one per step: each rule draws as its own card arrives,
+       so the sequence paces itself to the reader rather than to a clock. */
+    .phases li::before{animation:rule linear both;animation-timeline:view();animation-range:entry 15% entry 70%}
+    @keyframes rule{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  }
+}
 
 /* ── CTA band ───────────────────────────────────────────────────────────── */
 .cta-band{padding:clamp(56px,8vw,104px) 0}

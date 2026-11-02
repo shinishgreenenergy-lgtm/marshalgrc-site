@@ -55,6 +55,25 @@ test("the obligation index lists every framework with its domain", async ({ page
   await expect(rows.first()).toContainText("Cybersecurity");
 });
 
+test("the control dial places every obligation on the ring", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "below 720px the dial becomes a ruled register");
+  await page.goto("/");
+  const stage = (await page.locator(".stage").boundingBox())!;
+  const cx = stage.x + stage.width / 2;
+  const cy = stage.y + stage.height / 2;
+  const buttons = page.locator(".index-list button");
+  await expect(buttons).toHaveCount(8);
+  const radii: number[] = [];
+  for (let i = 0; i < 8; i++) {
+    const b = (await buttons.nth(i).boundingBox())!;
+    radii.push(Math.hypot(b.x + b.width / 2 - cx, b.y + b.height / 2 - cy));
+  }
+  // A CSS slip that cancels the positioning stacks all eight on the centre —
+  // the same failure the old lattice had, and invisible to a text assertion.
+  expect(Math.min(...radii), "labels must sit outside the hub").toBeGreaterThan(stage.width * 0.3);
+  expect(Math.max(...radii) - Math.min(...radii), "labels must sit on one circle").toBeLessThan(2);
+});
+
 test("the hero headline is readable with motion switched off", async ({ browser }) => {
   // The juror test: kill the motion and the static frame must still hold.
   // toBeVisible() passes on a stuck reveal, so assert the settled position.
