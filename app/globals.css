@@ -185,9 +185,10 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
    wider than that, but they are empty space on a shield.) Behind the name, so
    z-index:1 on the label is what keeps it readable. */
 .sun-mark{position:absolute;inset:0;width:100%;aspect-ratio:1;display:block;
-          opacity:.3;pointer-events:none}
-/* Black on gold. The mark and the name are the dark side of this disc. */
-.mark-shield,.mark-shackle,.mark-bar{stroke:#160D00}
+          opacity:.8;pointer-events:none}
+/* White, on gold and on navy alike -- the one colour that works on both
+   grounds, so the mobile register needs no colour override of its own. */
+.mark-shield,.mark-shackle,.mark-bar{stroke:#FFFFFF}
 .mark-shield{fill:none;stroke-width:5;stroke-linejoin:round}
 .mark-shackle{fill:none;stroke-width:7;stroke-linecap:round}
 .mark-bar{stroke-width:7;stroke-linecap:round}
@@ -358,27 +359,27 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
   .orrery{aspect-ratio:auto;max-width:34rem}
   .orrery[data-mode="sweep"] .world{animation:none}
   .plane,.plane-front{display:none}
-  /* The disc is a desktop device. Left on, its glow is positioned against
-     .orrery and hangs a third of the figure off both edges of the phone. */
   /* relative, and tall enough to hold the watermark: once the shield is
      taken out of flow this box collapses to the height of the name, and an
-     absolutely centred shield would then bleed over the first domain row. */
+     absolutely centred shield would then bleed over the first domain row.
+     isolation:isolate because the disc below rides at z-index:-1 -- on
+     desktop the translate() contains it, and transform:none here does not. */
   .sun{position:relative;inset:auto;transform:none;width:auto;aspect-ratio:auto;
-       padding:0;min-height:clamp(8rem,38vw,10.5rem);margin:0 auto 22px}
-  /* The same watermark as the disc, on the navy field instead of on gold.
-     Sized off the viewport rather than off .sun, whose height is now set by
-     this rule -- reading one from the other would be circular. */
-  .sun-mark{position:absolute;inset:auto;left:50%;top:50%;translate:-50% -50%;
-            width:clamp(8rem,38vw,10.5rem);opacity:.3}
-  /* The disc would resolve against .orrery, not against this box, and cover
-     the whole register. There is no plane for it to be the centre of here. */
-  .sun::before{display:none}
-  /* ...and with no gold disc behind it, black type would be black on navy. */
-  .mark-shield,.mark-shackle{stroke:var(--gold)}
-  .mark-bar{stroke:var(--field-ink-2)}
+       padding:0;min-height:clamp(8rem,38vw,10.5rem);margin:0 auto 22px;
+       isolation:isolate}
+  /* Mark and disc share one width, which is what keeps the shield inscribed
+     in the circle here exactly as it is on desktop. Sized off the viewport
+     rather than off .sun, whose height is now set by these -- reading one
+     from the other would be circular. */
+  .sun-mark,.sun::before{position:absolute;inset:auto;left:50%;top:50%;
+            translate:-50% -50%;width:clamp(8rem,38vw,10.5rem);aspect-ratio:1}
+  /* The disc comes back at phone width. A white shield needs gold under it:
+     on the bare navy field the name washed out against its own watermark,
+     because the name is light here and the shield is now nearly solid. */
+  .sun::before{display:block}
   /* Held narrower than the shield so the name breaks over it rather than
-     running out past its shoulders. */
-  .sun .sun-label{color:var(--field-ink);margin:0;max-width:clamp(4.7rem,22.4vw,6.2rem)}
+     running out past its shoulders. Dark on gold, as on desktop. */
+  .sun .sun-label{margin:0;max-width:clamp(4.7rem,22.4vw,6.2rem)}
   .worlds{position:static}
   .world{position:static;transform:none;z-index:auto;--near:1;--a:0deg;
          border-top:1px solid rgba(234,240,248,.16)}
