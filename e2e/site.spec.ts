@@ -77,7 +77,7 @@ test("the removed claim and caption are gone from the home page", async ({ page 
   expect(body).not.toContain("One control library, every obligation");
   expect(body).not.toContain("Each requirement links back to one shared control");
   await expect(page.locator(".index-claim, .index-note, .dial, .index-list")).toHaveCount(0);
-  await expect(page.locator(".sun-label")).toHaveText("GRC control library");
+  await expect(page.locator(".sun-label")).toHaveText("Marshal Control Library");
 });
 
 test("every domain rides its own eccentric orbit, library at a focus", async ({ page }, info) => {

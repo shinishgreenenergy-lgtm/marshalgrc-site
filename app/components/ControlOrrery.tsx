@@ -6,7 +6,7 @@ import { SERVICES } from "../content";
 /**
  * The hero figure: an orrery of obligations.
  *
- * The claim is one control set, so the GRC control library is the sun and each
+ * The claim is one control set, so the Marshal Control Library is the sun and each
  * governance domain holds its own orbit around it. The standards a domain
  * answers to are its moons, read straight off SERVICES — the figure cannot
  * claim a standard the services page does not already list.
@@ -25,9 +25,10 @@ const VW = 1000;
 const VH = 560;
 const CX = VW / 2;
 const CY = VH / 2;
-/** The sun's disc. Matches .sun{width:16.4%} exactly, which is what lets the
-    near arcs be clipped to it and pass over the library convincingly. */
-const SUN_R = 82;
+/** The sun's disc. Matches .sun{width:12.8%} exactly, which is what lets the
+    near arcs be clipped to it and pass over the library convincingly. Change
+    one of the two and the near arcs stop meeting the disc's edge. */
+const SUN_R = 64;
 /** Innermost and outermost orbit, in viewBox units across. */
 const R0 = 160;
 const R1 = 452;
@@ -136,13 +137,13 @@ export function ControlOrrery() {
       <div className="sun">
         <svg className="sun-mark" viewBox="0 0 140 140" aria-hidden="true">
           {/* The Stellar Marshal shield: shackle over three bars. */}
-          <g transform="translate(70 66) scale(.42)">
+          <g transform="translate(70 70) scale(1.10)">
             <path className="mark-shield" d="M0 -52 L46 -36 V2 C46 27 26 45 0 53 C-26 45 -46 27 -46 2 V-36 Z" />
             <path className="mark-shackle" d="M-15 0 V-13 A15 15 0 0 1 15 -13 V0" />
             <path className="mark-bar" d="M-26 6 H26 M-26 20 H26 M-26 34 H26" />
           </g>
         </svg>
-        <p className="sun-label">GRC control library</p>
+        <p className="sun-label">Marshal Control Library</p>
       </div>
 
       {/* The near half of every ring, clipped to the library's own disc and

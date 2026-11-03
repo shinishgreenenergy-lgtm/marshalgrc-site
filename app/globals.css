@@ -133,7 +133,7 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
 .invert a:not(.btn){color:var(--gold-pale)}
 
 /* ── Control orrery: the hero figure ────────────────────────────────────────
-   The GRC control library is the sun. Each governance domain holds its own
+   The Marshal Control Library is the sun. Each governance domain holds its own
    orbit around it, and the standards that domain answers to are its moons.
    The rings are ellipses because the plane is tilted: a circular orbit seen
    from ~30 degrees above foreshortens its depth axis by sin(30), which is the
@@ -165,8 +165,10 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
    element, not to the SVG plane: in the plane it painted before .worlds, and
    a named moon crossing the middle rode over the sun and over its label. */
 .sun{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:40;
-     width:16.4%;aspect-ratio:1;display:grid;place-content:center;place-items:center;
-     text-align:center;padding:0 3%}
+     width:12.8%;aspect-ratio:1;display:grid;place-content:center;place-items:center;
+     /* NB percentage padding resolves against .orrery, not this element:
+        3% was 69px of a 147px disc. 2.2% leaves the name ~66% of the disc. */
+     text-align:center;padding:0 2.2%}
 /* Gold, and lit from upper-left like every world orbiting it. One light
    source across the whole figure is what makes the spheres read as round
    rather than as discs with a gradient on them. */
@@ -175,13 +177,22 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
                #FDF1D2 0 9%,#F0CB7C 32%,#CBA25F 60%,#906C2E 86%,#63481B 100%);
              border:1px solid rgba(255,243,214,.85);
              box-shadow:0 0 54px rgba(201,160,93,.5),0 0 130px rgba(201,160,93,.2)}
-.sun-mark{width:clamp(2.8rem,6vw,4.8rem);aspect-ratio:1;display:block}
+/* The shield is the ground the name sits on, not a second object beside it:
+   at this size the disc cannot hold a mark above a two-line name. scale(1.14)
+   in the markup is the largest that still inscribes the shield, stroke
+   included, in the circle: at 1.10 its widest point, the shoulder at (46,-36)
+   plus half a stroke, lands at r=67 of the disc's 70. (The bbox corners sit
+   wider than that, but they are empty space on a shield.) Behind the name, so
+   z-index:1 on the label is what keeps it readable. */
+.sun-mark{position:absolute;inset:0;width:100%;aspect-ratio:1;display:block;
+          opacity:.3;pointer-events:none}
 /* Black on gold. The mark and the name are the dark side of this disc. */
 .mark-shield,.mark-shackle,.mark-bar{stroke:#160D00}
 .mark-shield{fill:none;stroke-width:5;stroke-linejoin:round}
 .mark-shackle{fill:none;stroke-width:7;stroke-linecap:round}
 .mark-bar{stroke-width:7;stroke-linecap:round}
-.sun .sun-label{margin:.3rem 0 0;font-family:var(--display);font-weight:600;line-height:1.25;
+.sun .sun-label{position:relative;z-index:1;margin:0;
+           font-family:var(--display);font-weight:600;line-height:1.25;
            font-size:clamp(.7rem,.95vw,.9rem);color:#160D00}
 
 /* --lit is how lit a domain is, 0 to 1. One number drives the zoom, the
@@ -350,14 +361,14 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
   /* The disc is a desktop device. Left on, its glow is positioned against
      .orrery and hangs a third of the figure off both edges of the phone. */
   .sun{position:static;transform:none;width:auto;aspect-ratio:auto;padding:0;margin:0 auto 26px}
-  .sun-mark{width:clamp(4.5rem,22vw,6rem)}
+  .sun-mark{position:static;inset:auto;width:clamp(1.65rem,8vw,2.2rem);opacity:1}
   /* The sun goes static here, so its disc would resolve against .orrery and
      cover the whole register. There is no plane to be the centre of anyway. */
   .sun::before{display:none}
   /* ...and with no gold disc behind it, black type would be black on navy. */
   .mark-shield,.mark-shackle{stroke:var(--gold)}
   .mark-bar{stroke:var(--field-ink-2)}
-  .sun .sun-label{color:var(--field-ink)}
+  .sun .sun-label{color:var(--field-ink);margin:.3rem 0 0}
   .worlds{position:static}
   .world{position:static;transform:none;z-index:auto;--near:1;--a:0deg;
          border-top:1px solid rgba(234,240,248,.16)}
