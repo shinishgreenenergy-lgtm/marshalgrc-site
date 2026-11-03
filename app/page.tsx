@@ -105,7 +105,7 @@ export default function Home() {
 
       <section className="section">
         <div className="wrap">
-          <div className="spread" style={{ marginBottom: "clamp(32px,5vw,56px)" }}>
+          <div className="offer-block">
             <header>
               <h2>{OFFER.heading}</h2>
               <p className="lede">{OFFER.lede}</p>

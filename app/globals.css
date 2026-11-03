@@ -438,21 +438,53 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
 .notes p,.report p{margin:0;color:var(--ink-2);font-size:1rem}
 @media (max-width:760px){.notes,.reports{grid-template-columns:1fr}}
 
-/* ── Offer ──────────────────────────────────────────────────────────────── */
-.offer{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,3vw,32px)}
-.offer article{padding:32px;background:var(--card);border:1px solid var(--rule)}
+/* The three bays are the point of this section, so they take the full width
+   instead of sharing it with a sticky header column -- beside one, every
+   heading wrapped to three lines. */
+.offer-block > header{max-width:48rem;margin-bottom:clamp(30px,4vw,52px)}
+.offer-block > header h2{margin-bottom:18px}
+.offer-block > header .lede{font-size:1.05rem}
+
+/* ── Offer: three ways in, not three equal boxes ────────────────────────────
+   These are alternatives, not a sequence, so they carry no numerals. What
+   they do carry is weight: the platform is the thing being sold, so its bay
+   is wider and keeps the deep field while the other two sit light beside it.
+   One shared timeline named on the row -- each bay has the same top edge, so
+   a bare view() on each would fire all three at the same instant instead of
+   letting them arrive in turn. ─────────────────────────────────────────── */
+.offer{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:clamp(20px,3vw,32px);
+       view-timeline:--offer block}
+.offer article{position:relative;padding:34px 32px 30px;background:var(--card);
+               border:1px solid var(--rule);display:flex;flex-direction:column;
+               transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease}
+/* A bar, not a border-top: a border cannot be drawn on. At rest and in any
+   browser without view() it is the same 3px gold rule it always was. */
+.offer article::before{content:"";position:absolute;inset:0 0 auto;height:3px;
+                       background:var(--gold);transform-origin:left}
 .offer article.lead{background:var(--field);color:var(--field-ink);border-color:var(--field)}
+.offer article.lead::before{background:var(--gold-pale)}
 .offer article.lead p{color:var(--field-ink-2)}
-.offer article.lead .more{color:var(--gold-pale)}
+.offer article.lead .more{color:var(--gold-pale);border-bottom-color:var(--gold-pale)}
 .offer h3{margin-bottom:12px;font-size:1.25rem}
+.offer article.lead h3{font-size:1.4rem}
 .offer p{color:var(--ink-2);font-size:1rem}
 .offer .more{display:inline-flex;align-items:center;min-height:44px;font-weight:600;text-decoration:none;
-  border-bottom:2px solid var(--gold);padding-bottom:2px}
-@media (max-width:900px){.offer{grid-template-columns:1fr}}
+  border-bottom:2px solid var(--gold);padding-bottom:2px;margin-top:auto;align-self:flex-start}
+/* Motion that answers the pointer rather than running at it. focus-within as
+   well as hover, because the only thing in the bay is a link. */
+.offer article:hover,.offer article:focus-within{transform:translateY(-6px);
+  border-color:var(--gold);box-shadow:0 16px 36px rgba(15,48,84,.16)}
+.offer article.lead:hover,.offer article.lead:focus-within{border-color:var(--gold);
+  box-shadow:0 18px 44px rgba(10,30,56,.45)}
+@media (max-width:900px){.offer{grid-template-columns:1fr}.offer article.lead h3{font-size:1.25rem}}
 
 /* ── Stages and steps: a real sequence, so numerals are earned ──────────── */
-.phases{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,3vw,40px)}
-.phases li{position:relative;padding-top:22px}
+.phases{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);
+        gap:clamp(24px,3vw,40px);view-timeline:--phases block}
+/* A column, so the deliverable can be pushed to the bottom: the three stages
+   carry different amounts of body copy, and without this their "You receive"
+   lines sit at three different heights and stop reading as one register. */
+.phases li{position:relative;padding-top:22px;display:flex;flex-direction:column}
 /* A bar rather than a border, so it can be drawn on. At rest, and wherever
    view() is unsupported, it is the same 3px gold line it has always been. */
 .phases li::before{content:"";position:absolute;inset:0 0 auto;height:3px;
@@ -461,17 +493,44 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
   display:block;margin-bottom:14px;letter-spacing:-.04em}
 .phases h3{font-size:1.2rem;margin-bottom:10px}
 .phases p{margin:0;color:var(--ink-2);font-size:1rem}
-.phases .deliv{margin-top:16px;padding-top:14px;border-top:1px solid var(--rule);color:var(--ink);font-size:.95rem}
+.phases .deliv{margin-top:auto;padding-top:14px;border-top:1px solid var(--rule);color:var(--ink);font-size:.95rem}
 .invert .phases li::before{background:var(--gold-pale)}
 .invert .phases .num{color:var(--gold-pale)}
 .invert .phases .deliv{color:var(--field-ink);border-top-color:rgba(234,240,248,.18)}
 @media (max-width:900px){.phases{grid-template-columns:1fr;gap:28px}}
+
+/* ── Both rows arrive a bay at a time ───────────────────────────────────────
+   Scroll-driven, never timed. The hidden state lives ONLY in the keyframes:
+   put opacity:0 in the base rule and Firefox and Safari, which have no
+   view(), show three empty columns forever.
+
+   Entry uses `translate`, not `transform`, on purpose. These animations fill
+   `both`, and a filled animation beats a declarative rule -- so animating
+   `transform` here would permanently cancel the hover lift above. They are
+   separate properties and compose. ─────────────────────────────────────── */
+@keyframes bay-in{from{opacity:0;translate:0 22px}to{opacity:1;translate:none}}
+@keyframes rule{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @supports (animation-timeline:view()){
   @media (prefers-reduced-motion:no-preference){
-    /* Three timelines, one per step: each rule draws as its own card arrives,
-       so the sequence paces itself to the reader rather than to a clock. */
-    .phases li::before{animation:rule linear both;animation-timeline:view();animation-range:entry 15% entry 70%}
-    @keyframes rule{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+    .offer article,.phases li{animation:bay-in linear both;animation-timeline:--offer}
+    .offer article::before,.phases li::before{animation:rule linear both;animation-timeline:--offer}
+    .phases li,.phases li::before{animation-timeline:--phases}
+
+    .offer article:nth-child(1),.offer article:nth-child(1)::before,
+    .phases li:nth-child(1),.phases li:nth-child(1)::before{animation-range:entry 14% entry 48%}
+    .offer article:nth-child(2),.offer article:nth-child(2)::before,
+    .phases li:nth-child(2),.phases li:nth-child(2)::before{animation-range:entry 28% entry 62%}
+    .offer article:nth-child(3),.offer article:nth-child(3)::before,
+    .phases li:nth-child(3),.phases li:nth-child(3)::before{animation-range:entry 42% entry 76%}
+
+    /* Stacked, the bays already arrive one after another by position, and the
+       row is taller than the viewport -- so its own `entry` range never
+       completes and the third bay would never be dealt. Each bay times itself
+       off its own passage here. */
+    @media (max-width:900px){
+      .offer article,.offer article::before,.phases li,.phases li::before{
+        animation-timeline:view();animation-range:entry 8% entry 55%}
+    }
   }
 }
 
