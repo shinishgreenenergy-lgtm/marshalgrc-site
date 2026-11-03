@@ -29,8 +29,16 @@ const CY = VH / 2;
     near arcs be clipped to it and pass over the library convincingly. */
 const SUN_R = 82;
 /** Innermost and outermost orbit, in viewBox units across. */
-const R0 = 148;
+const R0 = 160;
 const R1 = 452;
+/* Every orbit points its perihelion the SAME way. That is the whole trick:
+   ellipses sharing a focus AND an orientation nest without ever crossing, so
+   the rings can stay strongly eccentric without one cutting through another.
+   Point them in different directions and the eccentricity has to collapse to
+   almost nothing before the paths stop intersecting. 270deg puts perihelion
+   at the top, so the rings tuck in tight behind the library and fan out in
+   front of it -- the crowded side is the side the sun is hiding anyway. */
+const PERI = (270 * Math.PI) / 180;
 /** Every orbit keeps the plane's own tilt, so they read as one system. */
 const TILT = 0.487;
 
@@ -44,15 +52,14 @@ const WORLDS = SERVICES.map((s, i) => {
      the Mercury-like path: a ring visibly off to one side, tight against the
      library at perihelion and long away from it at aphelion. Circles all
      sharing a centre are a dartboard; this is a solar system. */
-  const e = 0.3 - (0.24 * i) / (N - 1);
+  const e = 0.26 - (0.2 * i) / (N - 1);
   const rx = a;
   const ry = a * Math.sqrt(1 - e * e) * TILT;
   /* The sun sits at a focus, not at the centre, so the orbit's own centre is
-     displaced by a*e away from perihelion. Each orbit points its perihelion
-     somewhere different, which is what stops eight rings nesting tidily. */
-  const peri = (i * 47 * Math.PI) / 180;
-  const ox = -a * e * Math.cos(peri);
-  const oy = -a * e * Math.sin(peri) * TILT;
+     displaced by a*e away from perihelion -- see PERI for why every orbit is
+     displaced the same way. */
+  const ox = -a * e * Math.cos(PERI);
+  const oy = -a * e * Math.sin(PERI) * TILT;
   const cx = CX + ox;
   const cy = CY + oy;
   /* The whole ring is drawn once in the layer under the library, then its

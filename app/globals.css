@@ -139,7 +139,13 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
    from ~30 degrees above foreshortens its depth axis by sin(30), which is the
    0.487 the component draws with. Every name is read off SERVICES, so the
    figure cannot claim a standard the services page does not list. ─────── */
-.orrery{position:relative;width:100%;max-width:1180px;margin-inline:auto;aspect-ratio:1000/560}
+/* isolate, because the figure stacks internally up to 170 to get its depth
+   right -- near planets over the library, held ones over everything. Without
+   a stacking context of its own those numbers compete with .site-head at 50
+   and the planets scroll OVER the nav bar. Isolated, the whole figure is one
+   layer that passes under the header like any other content. */
+.orrery{position:relative;width:100%;max-width:1180px;margin-inline:auto;
+        aspect-ratio:1000/560;isolation:isolate}
 .plane,.plane-front{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 /* The near half of every ring, clipped to the library's disc and painted over
    it, so each orbit passes behind the sun at the back and in front at the

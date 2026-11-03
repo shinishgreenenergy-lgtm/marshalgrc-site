@@ -88,18 +88,20 @@ test("every domain rides its own eccentric orbit, library at a focus", async ({ 
   const cy = stage.y + stage.height / 2;
   const worlds = page.locator(".world");
   await expect(worlds).toHaveCount(8);
-  // Eight orbits with semi-major axes from 148 to 452 across a 1000x560 box,
+  // Eight orbits with semi-major axes from 160 to 452 across a 1000x560 box,
   // every one squashed by 0.487 -- a circular plane seen from just under 30
   // degrees above. The library sits at a FOCUS, not at the centre, so each
-  // orbit's own centre is displaced by a*e away from its perihelion. That
-  // displacement is the Mercury-like hang to one side; without it the figure
-  // is a dartboard, so both halves of this are asserted.
+  // orbit's own centre is displaced by a*e away from its perihelion, and
+  // every perihelion points the same way (270deg) so the rings nest instead
+  // of cutting through one another. That displacement is the Mercury-like
+  // hang to one side; without it the figure is a dartboard, so both halves
+  // of this are asserted.
   const err: number[] = [];
   const offs: number[] = [];
   for (let i = 0; i < 8; i++) {
-    const a = 148 + (304 * i) / 7;
-    const e = 0.3 - (0.24 * i) / 7;
-    const peri = (i * 47 * Math.PI) / 180;
+    const a = 160 + (292 * i) / 7;
+    const e = 0.26 - (0.2 * i) / 7;
+    const peri = (270 * Math.PI) / 180;
     const rx = stage.width * (a / 1000);
     const ry = stage.height * ((a * Math.sqrt(1 - e * e) * 0.487) / 560);
     const ox = stage.width * ((-a * e * Math.cos(peri)) / 1000);
@@ -112,6 +114,61 @@ test("every domain rides its own eccentric orbit, library at a focus", async ({ 
   }
   expect(Math.max(...err), "every domain must sit on its own orbit").toBeLessThan(0.05);
   expect(Math.max(...offs), "orbits must be off-centre, not concentric").toBeGreaterThan(20);
+});
+
+test("no orbit crosses another orbit's path", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "below 860px the plane folds into a register");
+  await page.goto("/");
+  // Every orbit shares a focus AND a perihelion direction, which is what lets
+  // them stay eccentric and still nest. Read the ellipses the component
+  // actually rendered, then check ring i lies wholly inside ring i+1: sample
+  // its path and require every point strictly inside the next ellipse.
+  const rings = await page.evaluate(() =>
+    [...document.querySelectorAll(".world")].map((w) => {
+      const s = getComputedStyle(w);
+      const n = (v: string) => parseFloat(s.getPropertyValue(v));
+      return { rx: n("--rx"), ry: n("--ry"), ox: n("--ox"), oy: n("--oy") };
+    }),
+  );
+  expect(rings).toHaveLength(8);
+  // --rx/--ox are percentages of the figure's width and --ry/--oy of its
+  // height, so compare in those units -- the containment test is affine and
+  // does not care, as long as x and y are each self-consistent.
+  let worst = 0;
+  for (let i = 0; i < rings.length - 1; i++) {
+    const a = rings[i];
+    const b = rings[i + 1];
+    for (let d = 0; d < 720; d++) {
+      const t = (d * Math.PI) / 360;
+      const x = a.ox + a.rx * Math.cos(t);
+      const y = a.oy + a.ry * Math.sin(t);
+      worst = Math.max(worst, ((x - b.ox) / b.rx) ** 2 + ((y - b.oy) / b.ry) ** 2);
+    }
+  }
+  expect(worst, "each orbit must lie wholly inside the next one out").toBeLessThan(1);
+});
+
+test("the figure never paints over the nav bar", async ({ page }) => {
+  await page.goto("/");
+  // The figure stacks internally up to 170 to get its depth right. Those
+  // numbers must stay inside it: .site-head is z-index 50, and a planet or a
+  // standard pill scrolling over the navigation is the failure this catches.
+  await page.evaluate(() => window.scrollTo(0, 260));
+  await page.waitForTimeout(400);
+  const head = page.locator(".site-head");
+  await expect(head).toBeVisible();
+  const covered = await page.evaluate(() => {
+    const h = document.querySelector(".site-head")!.getBoundingClientRect();
+    const hits: string[] = [];
+    for (let x = 8; x < window.innerWidth; x += 24) {
+      for (let y = 4; y < h.bottom; y += 8) {
+        const el = document.elementFromPoint(x, y);
+        if (el && el.closest(".orrery")) hits.push(`${x},${y}:${el.className}`);
+      }
+    }
+    return hits.slice(0, 5);
+  });
+  expect(covered, "nothing from the orrery may sit on top of the header").toEqual([]);
 });
 
 test("each orbit crosses in front of the library and vanishes behind it", async ({ page }, info) => {
