@@ -135,36 +135,48 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
 /* ── Control orrery: the hero figure ────────────────────────────────────────
    The GRC control library is the sun. Each governance domain holds its own
    orbit around it, and the standards that domain answers to are its moons.
-   Eight concentric ellipses rather than circles: the figure is nearly twice as
-   wide as it is tall, and only a plane seen at an angle separates eight rings
-   at that proportion. Every name is read off SERVICES, so the figure cannot
-   claim a standard the services page does not list. ─────────────────────── */
+   The rings are ellipses because the plane is tilted: a circular orbit seen
+   from ~30 degrees above foreshortens its depth axis by sin(30), which is the
+   0.487 the component draws with. Every name is read off SERVICES, so the
+   figure cannot claim a standard the services page does not list. ─────── */
 .orrery{position:relative;width:100%;max-width:1180px;margin-inline:auto;aspect-ratio:1000/560}
-.plane{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.orbit{fill:none;stroke:rgba(168,189,214,.18);stroke-width:1;
+.plane,.plane-front{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+/* The near half of every ring, clipped to the library's disc and painted over
+   it, so each orbit passes behind the sun at the back and in front at the
+   front. Nothing in this layer is interactive and it sits above the worlds,
+   so it must not swallow a hover meant for the planet beneath it. */
+.plane-front{z-index:41;pointer-events:none}
+.orbit{fill:none;stroke:rgba(168,189,214,.2);stroke-width:1;
        transition:stroke .3s ease,stroke-width .3s ease}
-/* The lit domain's own path, so it is obvious which ring the world is riding. */
-.orbit.on{stroke:rgba(250,243,170,.55);stroke-width:1.5}
+/* Crossing the lit face of the sun, a pale hairline on gold is invisible —
+   the near arc is the shadow the ring casts on the disc, so it goes dark. */
+.orbit.over{stroke:rgba(58,38,8,.42)}
+.orbit.on{stroke:rgba(250,243,170,.6);stroke-width:1.6}
+.orbit.over.on{stroke:rgba(48,29,2,.8);stroke-width:1.9}
 
 /* The sun. The shield is the product's own mark, so the centre of the figure
-   and the centre of the brand are the same object. */
-/* The disc belongs to the sun element, not to the SVG plane. In the plane it
-   paints before .worlds, so a named moon crossing the middle of the figure
-   rode over the sun and over its label. Here the sun is one object that sits
-   above the system, and a moon passing behind it is properly hidden — which
-   is what an orrery does anyway. */
+   and the centre of the brand are the same object. The disc belongs to this
+   element, not to the SVG plane: in the plane it painted before .worlds, and
+   a named moon crossing the middle rode over the sun and over its label. */
 .sun{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:40;
      width:16.4%;aspect-ratio:1;display:grid;place-content:center;place-items:center;
      text-align:center;padding:0 3%}
+/* Gold, and lit from upper-left like every world orbiting it. One light
+   source across the whole figure is what makes the spheres read as round
+   rather than as discs with a gradient on them. */
 .sun::before{content:"";position:absolute;inset:0;border-radius:50%;z-index:-1;
-             background:radial-gradient(circle at 38% 32%,#235283,#15406C 62%,#0C2847 100%);
-             border:2px solid rgba(192,152,89,.8)}
+             background:radial-gradient(circle at 34% 28%,
+               #FDF1D2 0 9%,#F0CB7C 32%,#CBA25F 60%,#906C2E 86%,#63481B 100%);
+             border:1px solid rgba(255,243,214,.85);
+             box-shadow:0 0 54px rgba(201,160,93,.5),0 0 130px rgba(201,160,93,.2)}
 .sun-mark{width:clamp(2.8rem,6vw,4.8rem);aspect-ratio:1;display:block}
-.mark-shield{fill:none;stroke:var(--gold);stroke-width:5;stroke-linejoin:round}
-.mark-shackle{fill:none;stroke:var(--gold);stroke-width:7;stroke-linecap:round}
-.mark-bar{stroke:var(--field-ink-2);stroke-width:7;stroke-linecap:round}
-.sun-label{margin:.3rem 0 0;font-family:var(--display);font-weight:600;line-height:1.25;
-           font-size:clamp(.7rem,.95vw,.9rem);color:var(--field-ink)}
+/* Black on gold. The mark and the name are the dark side of this disc. */
+.mark-shield,.mark-shackle,.mark-bar{stroke:#160D00}
+.mark-shield{fill:none;stroke-width:5;stroke-linejoin:round}
+.mark-shackle{fill:none;stroke-width:7;stroke-linecap:round}
+.mark-bar{stroke-width:7;stroke-linecap:round}
+.sun .sun-label{margin:.3rem 0 0;font-family:var(--display);font-weight:600;line-height:1.25;
+           font-size:clamp(.7rem,.95vw,.9rem);color:#160D00}
 
 /* --lit is how lit a domain is, 0 to 1. One number drives the zoom, the
    colour and the satellites, so the scroll sweep and the pointer can both
@@ -184,59 +196,106 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
           back must actually shrink and fade on the way. */
        --near:calc(.5 + sin(var(--a)) * .5);
        position:absolute;
-       left:calc(50% + var(--rx) * cos(var(--a)));
-       top:calc(50% + var(--ry) * sin(var(--a)));
-       transform:translate(-50%,-50%);z-index:calc(10 + var(--lit) * 20)}
+       /* --ox/--oy displace the orbit's centre away from the sun, which sits
+          at a focus. That is what gives the inner domains a Mercury-like path
+          hanging to one side instead of eight tidily nested rings. */
+       left:calc(50% + var(--ox) + var(--rx) * cos(var(--a)));
+       top:calc(50% + var(--oy) + var(--ry) * sin(var(--a)));
+       transform:translate(-50%,-50%);
+       /* Stacking is depth, driven by --near: a world on the far side of its
+          orbit (0) passes UNDER the library, and one on the near side (1)
+          passes over it and over the near-arc layer at 41. A flat z-index
+          hid the planet behind the sun on both transits, while its own ring
+          was being drawn across the front -- the depth cue backwards. The
+          lit world outranks all of it, or hovering the innermost domain
+          hides the thing you just hovered. */
+       z-index:calc(10 + var(--near) * 60 + var(--lit) * 100)}
 .world.on{--lit:1}
 .world button{background:none;border:0;cursor:pointer;font:inherit;padding:6px 10px;
               display:grid;justify-items:center;white-space:nowrap;
               gap:calc(.4rem + var(--lit) * .5rem);
               font-size:clamp(.74rem,1vw,.92rem);font-weight:500;color:var(--field-ink);
-              opacity:calc(.55 + var(--near) * .45);
-              scale:calc(.88 + var(--near) * .12 + var(--lit) * .16);
+              opacity:calc(.6 + var(--near) * .4);
+              scale:calc(.9 + var(--near) * .1 + var(--lit) * .12);
               transition:gap .4s ease,scale .4s ease}
 .world button:focus-visible{outline:2px solid var(--gold-pale);outline-offset:3px}
-/* A lit limb rather than a flat fill, so the body reads as a sphere caught by
-   the sun at the centre instead of a dot on a line. */
+
+/* A real sphere, not a dot. Three things do it: a skin that runs warm near
+   the sun and cold far from it, a highlight placed on the limb that actually
+   faces the centre of the system, and an inset shadow thrown the opposite
+   way so the terminator falls where the light says it should. All three are
+   driven off --a, so a world relights itself as it travels round. */
 .world-body{display:block;width:var(--body);aspect-ratio:1;border-radius:50%;
-            background:radial-gradient(circle at 32% 30%,
-              color-mix(in oklab,var(--field-ink) 85%,var(--gold-pale)),
-              var(--field-ink-2) 62%,
-              color-mix(in oklab,var(--field-ink-2) 55%,var(--field)) 100%);
-            scale:calc(1 + var(--lit) * .9);
+            --skin:color-mix(in oklab,#6E8CB4,#E0A64E calc(var(--heat) * 100%));
+            --face:color-mix(in oklab,var(--skin),#FFFFFF 60%);
+            --limb:color-mix(in oklab,var(--skin),#061127 76%);
+            background:radial-gradient(circle at
+              calc(50% - 28% * cos(var(--a))) calc(50% - 28% * sin(var(--a))),
+              var(--face) 0 12%,var(--skin) 48%,var(--limb) 100%);
+            box-shadow:
+              inset calc(var(--body) * .11 * cos(var(--a)))
+                    calc(var(--body) * .11 * sin(var(--a)))
+                    calc(var(--body) * .36) calc(var(--body) * -.05) rgba(3,10,24,.78),
+              0 calc(var(--body) * .14) calc(var(--body) * .3) rgba(2,8,18,.42);
+            scale:calc(1 + var(--lit) * .5);
             transition:scale .4s ease,box-shadow .3s ease}
-.world.on .world-body{box-shadow:0 0 18px rgba(250,243,170,.5);
-                      background:radial-gradient(circle at 32% 30%,#fff,
-                        var(--gold-pale) 58%,var(--gold) 100%)}
+/* Held, a world is the one the sun is answering, so it brightens past every
+   other body in the figure. The navy ring is not decoration: the innermost
+   orbit grazes the library's disc, and a gold sphere lit against a gold sun
+   has no edge at all without it. */
+.world.on .world-body{--skin:#FFEFC4;
+                      box-shadow:
+                        inset calc(var(--body) * .1 * cos(var(--a)))
+                              calc(var(--body) * .1 * sin(var(--a)))
+                              calc(var(--body) * .3) calc(var(--body) * -.05) rgba(44,26,0,.5),
+                        0 0 0 3px rgba(9,26,48,.9),
+                        0 0 30px rgba(250,243,170,.6)}
 .world-name{color:color-mix(in oklab,var(--field-ink),var(--gold-pale) calc(var(--lit) * 100%))}
+/* Same reason: the lit name can be crossing the gold disc when it is read. */
+.world.on .world-name{text-shadow:0 1px 2px rgba(6,18,36,.95),0 0 12px rgba(6,18,36,.85)}
 
 /* Moons. Position is trigonometry on an angle that runs several times the
    world's own, so each domain visibly carries its standards round itself
-   while the whole system turns. The dot is always drawn; the name waits to be
-   asked for, because twenty-four labels at once is not a diagram. */
+   while the whole system turns. The bead is always drawn; the name waits to
+   be asked for, because twenty-four labels at once is not a diagram. */
+/* Centred on the sphere, not on the button. 50%/50% is the middle of the
+   whole control — body stacked over name — so the ring sat low and the pills
+   landed on the domain's own label. The offset is half the name row plus the
+   gap above it, and the gap grows with --lit, so the correction has to too. */
 .moons{list-style:none;margin:0;padding:0;position:absolute;left:50%;top:50%;
-       width:0;height:0;pointer-events:none;z-index:-1}
+       width:0;height:0;pointer-events:none;z-index:-1;
+       translate:0 calc(-11px - var(--lit) * 4px)}
 /* Lit, a domain's moons swing wide. At rest they are beads tucked against
    their world; named, they need room to be read, and a pill is twenty times
    the width of the bead it replaces. Widening the orbit is what buys that
    room — the alternative is five labels stacked on one planet. */
-.moon{--mrl:calc(var(--mr) * (1 + var(--lit) * 1.8));
+.moon{--mrl:calc(var(--mr) * (1 + var(--lit) * 1.3));
       position:absolute;
       left:calc(var(--mrl) * cos(calc(var(--spin) * 3.4) + var(--m) * 1turn));
       top:calc(var(--mrl) * sin(calc(var(--spin) * 3.4) + var(--m) * 1turn));
       transform:translate(-50%,-50%);
-      scale:calc(.7 + var(--near) * .3);
+      scale:calc(.75 + var(--near) * .25);
       transition:left .4s ease,top .4s ease}
-/* The moon itself: a bead, always visible. */
-.moon::before{content:"";position:absolute;left:50%;top:50%;width:4px;height:4px;
+/* The moon itself: a little sphere, lit the same way its world is. */
+.moon::before{content:"";position:absolute;left:50%;top:50%;
+              width:var(--bead,10px);height:var(--bead,10px);
               border-radius:50%;transform:translate(-50%,-50%);
-              background:var(--gold-pale);opacity:calc(.45 + var(--near) * .35);
-              box-shadow:0 0 6px rgba(250,243,170,.35)}
-.world.on .moon::before{opacity:1;width:5px;height:5px}
-.moon span{display:block;white-space:nowrap;padding:3px 9px;border-radius:999px;
-           font-size:clamp(.62rem,.82vw,.76rem);font-weight:500;
-           transform:translate(-50%,-50%) translateY(-14px);
+              background:radial-gradient(circle at 34% 30%,
+                #FFF6DC 0 22%,var(--gold-pale) 58%,#9C7945 100%);
+              opacity:calc(.5 + var(--near) * .35);
+              box-shadow:0 0 7px rgba(250,243,170,.4);
+              transition:width .3s ease,height .3s ease,
+                         box-shadow .3s ease,opacity .3s ease}
+/* Hovered, held or swept: the satellites are the answer being given, so they
+   grow and light up rather than merely becoming legible. */
+.world.on .moon::before{--bead:17px;opacity:1;
+                        box-shadow:0 0 16px rgba(250,243,170,.95),
+                                   0 0 34px rgba(250,243,170,.45)}
+.moon span{display:block;white-space:nowrap;padding:4px 11px;border-radius:999px;
+           font-size:clamp(.68rem,.9vw,.84rem);font-weight:600;
+           transform:translate(-50%,-50%) translateY(-20px);
            color:var(--field);background:var(--gold-pale);
+           box-shadow:0 2px 10px rgba(3,12,28,.45);
            opacity:var(--lit);transition:opacity .35s ease}
 
 /* ── The orrery turns ───────────────────────────────────────────────────────
@@ -281,7 +340,7 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
 @media (max-width:860px){
   .orrery{aspect-ratio:auto;max-width:34rem}
   .orrery[data-mode="sweep"] .world{animation:none}
-  .plane{display:none}
+  .plane,.plane-front{display:none}
   /* The disc is a desktop device. Left on, its glow is positioned against
      .orrery and hangs a third of the figure off both edges of the phone. */
   .sun{position:static;transform:none;width:auto;aspect-ratio:auto;padding:0;margin:0 auto 26px}
@@ -289,12 +348,16 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
   /* The sun goes static here, so its disc would resolve against .orrery and
      cover the whole register. There is no plane to be the centre of anyway. */
   .sun::before{display:none}
+  /* ...and with no gold disc behind it, black type would be black on navy. */
+  .mark-shield,.mark-shackle{stroke:var(--gold)}
+  .mark-bar{stroke:var(--field-ink-2)}
+  .sun .sun-label{color:var(--field-ink)}
   .worlds{position:static}
-  .world{position:static;transform:none;z-index:auto;--near:1;
+  .world{position:static;transform:none;z-index:auto;--near:1;--a:0deg;
          border-top:1px solid rgba(234,240,248,.16)}
   .world button{width:100%;display:flex;align-items:center;gap:.6rem;padding:14px 2px 8px;
                 opacity:1;scale:1;font-size:1rem}
-  .world-body{scale:1;width:10px}
+  .world-body{scale:1;width:16px;box-shadow:none}
   .moons{position:static;width:auto;height:auto;z-index:auto;
          display:flex;flex-wrap:wrap;gap:6px;padding:0 2px 16px 24px}
   .moon{position:static;transform:none;scale:1}

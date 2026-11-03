@@ -17,19 +17,21 @@ import { SERVICES } from "../content";
  * this clear of WCAG 2.2.2.
  */
 
-/* Drawn in a 1000x560 box, so every orbit is an ellipse rather than a circle:
-   a plane seen at an angle. Eight concentric rings only separate at that
-   proportion — on a circle the outer ones would crowd the top and bottom. */
+/* Drawn in a 1000x560 box. The squash is the viewing angle: a circular plane
+   seen from an angle f foreshortens its depth axis by sin(f), so TILT 0.487 is
+   this system bent to just under 30 degrees above the plane. Eight rings only
+   separate at that proportion — seen from overhead they would crowd. */
 const VW = 1000;
 const VH = 560;
 const CX = VW / 2;
 const CY = VH / 2;
-/** The sun's disc. Orbits start clear of it, not inside it. */
+/** The sun's disc. Matches .sun{width:16.4%} exactly, which is what lets the
+    near arcs be clipped to it and pass over the library convincingly. */
 const SUN_R = 82;
 /** Innermost and outermost orbit, in viewBox units across. */
 const R0 = 148;
 const R1 = 452;
-/** Every orbit keeps the plane's own squash, so they read as one system. */
+/** Every orbit keeps the plane's own tilt, so they read as one system. */
 const TILT = 0.487;
 
 const r2 = (n: number) => Number(n.toFixed(3));
@@ -40,10 +42,9 @@ const WORLDS = SERVICES.map((s, i) => {
   const a = R0 + ((R1 - R0) * i) / (N - 1);
   /* Eccentricity falls away outward, so the innermost domain is the one with
      the Mercury-like path: a ring visibly off to one side, tight against the
-     sun at perihelion and long away from it at aphelion. Circles all sharing
-     a centre are a dartboard; this is a solar system. */
-  const e = 0.24 - (0.2 * i) / (N - 1);
-  /** Semi-minor follows from the eccentricity, then takes the plane's tilt. */
+     library at perihelion and long away from it at aphelion. Circles all
+     sharing a centre are a dartboard; this is a solar system. */
+  const e = 0.3 - (0.24 * i) / (N - 1);
   const rx = a;
   const ry = a * Math.sqrt(1 - e * e) * TILT;
   /* The sun sits at a focus, not at the centre, so the orbit's own centre is
@@ -52,18 +53,29 @@ const WORLDS = SERVICES.map((s, i) => {
   const peri = (i * 47 * Math.PI) / 180;
   const ox = -a * e * Math.cos(peri);
   const oy = -a * e * Math.sin(peri) * TILT;
+  const cx = CX + ox;
+  const cy = CY + oy;
+  /* The whole ring is drawn once in the layer under the library, then its
+     near half is drawn AGAIN in a layer over it, clipped to the library's
+     disc. So each orbit vanishes behind the sun at the back of its path and
+     crosses in front of it at the front. That occlusion is the only thing
+     that tells an eye the plane has depth — without it eight squashed
+     ellipses read as flat rings painted on a wall. */
+  const L = `${r2(cx - rx)} ${r2(cy)}`;
+  const R = `${r2(cx + rx)} ${r2(cy)}`;
+  const arc = `A ${r2(rx)} ${r2(ry)} 0 0`;
+  const ring = `M ${L} ${arc} 1 ${R} ${arc} 1 ${L}`;
+  const near = `M ${L} ${arc} 0 ${R}`;
   /** The standards line off the services page, split — never retyped here. */
   const moons = s.standards.split(",").map((m) => m.trim()).filter(Boolean);
-  const body = r2(17 + moons.length * 2.4);
+  const body = r2(26 + moons.length * 5);
   return {
     id: s.id,
     name: s.short,
     title: s.title,
     moons,
-    rx: r2(rx),
-    ry: r2(ry),
-    ox: r2(ox),
-    oy: r2(oy),
+    ring,
+    near,
     /** As a share of the figure, because the figure is fluid and the box is not. */
     rxp: r2((rx / VW) * 100),
     ryp: r2((ry / VH) * 100),
@@ -78,7 +90,7 @@ const WORLDS = SERVICES.map((s, i) => {
     /** How close to the sun, 1 to 0 — the inner worlds run hot, the outer cold. */
     heat: r2(1 - i / (N - 1)),
     /** Moons ride clear of their own world, which is now a real sphere. */
-    mr: r2(body / 2 + 24 + moons.length * 2.2),
+    mr: r2(body / 2 + 30 + moons.length * 3),
   };
 });
 
@@ -99,19 +111,16 @@ export function ControlOrrery() {
               a very large planet: the disc itself has to stay dark enough for
               the mark and the label to sit on it. */}
           <radialGradient id="corona">
-            <stop offset="34%" stopColor="rgba(156,121,69,.55)" />
-            <stop offset="58%" stopColor="rgba(156,121,69,.22)" />
+            <stop offset="30%" stopColor="rgba(201,160,93,.5)" />
+            <stop offset="56%" stopColor="rgba(178,139,76,.2)" />
             <stop offset="100%" stopColor="rgba(156,121,69,0)" />
           </radialGradient>
         </defs>
         {WORLDS.map((w) => (
-          <ellipse
+          <path
             key={w.id}
             className={`orbit${active === w.id ? " on" : ""}`}
-            cx={CX}
-            cy={CY}
-            rx={w.rx}
-            ry={w.ry}
+            d={w.ring}
           />
         ))}
         <circle className="corona" cx={CX} cy={CY} r={SUN_R * 3.1} fill="url(#corona)" />
@@ -119,7 +128,7 @@ export function ControlOrrery() {
 
       <div className="sun">
         <svg className="sun-mark" viewBox="0 0 140 140" aria-hidden="true">
-          {/* The Stellar Marshal shield: gold shackle over three bars. */}
+          {/* The Stellar Marshal shield: shackle over three bars. */}
           <g transform="translate(70 66) scale(.42)">
             <path className="mark-shield" d="M0 -52 L46 -36 V2 C46 27 26 45 0 53 C-26 45 -46 27 -46 2 V-36 Z" />
             <path className="mark-shackle" d="M-15 0 V-13 A15 15 0 0 1 15 -13 V0" />
@@ -128,6 +137,26 @@ export function ControlOrrery() {
         </svg>
         <p className="sun-label">GRC control library</p>
       </div>
+
+      {/* The near half of every ring, clipped to the library's own disc and
+          painted over it. Clipped, because a near arc crossing the whole
+          bottom of the figure would also draw over the worlds riding it. */}
+      <svg className="plane-front" viewBox={`0 0 ${VW} ${VH}`} aria-hidden="true">
+        <defs>
+          <clipPath id="sun-disc">
+            <circle cx={CX} cy={CY} r={SUN_R} />
+          </clipPath>
+        </defs>
+        <g clipPath="url(#sun-disc)">
+          {WORLDS.map((w) => (
+            <path
+              key={w.id}
+              className={`orbit over${active === w.id ? " on" : ""}`}
+              d={w.near}
+            />
+          ))}
+        </g>
+      </svg>
 
       <ul className="worlds">
         {WORLDS.map((w) => {
@@ -142,8 +171,11 @@ export function ControlOrrery() {
                   "--base": `${w.base}deg`,
                   "--rx": `${w.rxp}%`,
                   "--ry": `${w.ryp}%`,
+                  "--ox": `${w.oxp}%`,
+                  "--oy": `${w.oyp}%`,
                   "--body": `${w.body}px`,
                   "--mr": `${w.mr}px`,
+                  "--heat": w.heat,
                 } as React.CSSProperties
               }
             >

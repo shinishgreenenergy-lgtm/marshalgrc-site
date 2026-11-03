@@ -80,7 +80,7 @@ test("the removed claim and caption are gone from the home page", async ({ page 
   await expect(page.locator(".sun-label")).toHaveText("GRC control library");
 });
 
-test("every domain rides its own orbit, widening outwards", async ({ page }, info) => {
+test("every domain rides its own eccentric orbit, library at a focus", async ({ page }, info) => {
   test.skip(info.project.name !== "desktop", "below 860px the plane folds into a register");
   await page.goto("/");
   const stage = (await page.locator(".orrery").boundingBox())!;
@@ -88,20 +88,80 @@ test("every domain rides its own orbit, widening outwards", async ({ page }, inf
   const cy = stage.y + stage.height / 2;
   const worlds = page.locator(".world");
   await expect(worlds).toHaveCount(8);
-  // The component spaces eight orbits from 148 to 452 across a 1000x560 box,
-  // each squashed to the same plane. Concentric, so the radius must grow with
-  // the index -- a slip that collapses them puts all eight on one ring.
+  // Eight orbits with semi-major axes from 148 to 452 across a 1000x560 box,
+  // every one squashed by 0.487 -- a circular plane seen from just under 30
+  // degrees above. The library sits at a FOCUS, not at the centre, so each
+  // orbit's own centre is displaced by a*e away from its perihelion. That
+  // displacement is the Mercury-like hang to one side; without it the figure
+  // is a dartboard, so both halves of this are asserted.
   const err: number[] = [];
+  const offs: number[] = [];
   for (let i = 0; i < 8; i++) {
-    const r = 148 + (304 * i) / 7;
-    const rx = stage.width * (r / 1000);
-    const ry = stage.height * ((r * 0.487) / 560);
+    const a = 148 + (304 * i) / 7;
+    const e = 0.3 - (0.24 * i) / 7;
+    const peri = (i * 47 * Math.PI) / 180;
+    const rx = stage.width * (a / 1000);
+    const ry = stage.height * ((a * Math.sqrt(1 - e * e) * 0.487) / 560);
+    const ox = stage.width * ((-a * e * Math.cos(peri)) / 1000);
+    const oy = stage.height * ((-a * e * Math.sin(peri) * 0.487) / 560);
     const b = (await worlds.nth(i).boundingBox())!;
-    const dx = (b.x + b.width / 2 - cx) / rx;
-    const dy = (b.y + b.height / 2 - cy) / ry;
+    const dx = (b.x + b.width / 2 - (cx + ox)) / rx;
+    const dy = (b.y + b.height / 2 - (cy + oy)) / ry;
     err.push(Math.abs(Math.hypot(dx, dy) - 1));
+    offs.push(Math.hypot(ox, oy));
   }
-  expect(Math.max(...err), "every domain must sit on its own orbit").toBeLessThan(0.1);
+  expect(Math.max(...err), "every domain must sit on its own orbit").toBeLessThan(0.05);
+  expect(Math.max(...offs), "orbits must be off-centre, not concentric").toBeGreaterThan(20);
+});
+
+test("each orbit crosses in front of the library and vanishes behind it", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "below 860px the plane folds into a register");
+  await page.goto("/");
+  // The whole ring is drawn under the sun; its near half is drawn AGAIN over
+  // the sun, clipped to the sun's own disc. That occlusion is the only depth
+  // cue the figure has -- lose it and eight ellipses read as flat rings.
+  await expect(page.locator(".plane-front path.orbit.over")).toHaveCount(8);
+  const layer = await page.evaluate(() => {
+    const f = getComputedStyle(document.querySelector(".plane-front")!);
+    const s = getComputedStyle(document.querySelector(".sun")!);
+    return {
+      front: Number(f.zIndex),
+      sun: Number(s.zIndex),
+      pointer: f.pointerEvents,
+      clip: document.querySelector(".plane-front g")!.getAttribute("clip-path"),
+    };
+  });
+  expect(layer.front).toBeGreaterThan(layer.sun);
+  // It covers the whole figure, so it must never swallow a hover meant for a
+  // planet underneath it.
+  expect(layer.pointer).toBe("none");
+  expect(layer.clip).toBe("url(#sun-disc)");
+});
+
+test("holding a domain grows its satellites and lights them", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "below 860px the plane folds into a register");
+  await page.goto("/");
+  // The figure is scroll-driven, so moving the pointer to a planet scrolls the
+  // page and travels the planet out from under it. Freeze the system first.
+  await page.addStyleTag({ content: ".orrery,.orrery *{animation:none !important}" });
+  const bead = () =>
+    page.evaluate(() => {
+      const css = getComputedStyle(
+        document.querySelector('.world[data-domain="cybersecurity"] .moon')!,
+        "::before",
+      );
+      return { size: parseFloat(css.width), glow: css.boxShadow };
+    });
+  const rest = await bead();
+  await page.locator('.world[data-domain="cybersecurity"] button').hover();
+  // The bead has a 0.3s transition on its size, so reading it once right after
+  // the pointer lands measures the animation, not the held state.
+  await expect
+    .poll(async () => (await bead()).size, {
+      message: "satellites must grow when their domain is held",
+    })
+    .toBeGreaterThan(rest.size);
+  expect((await bead()).glow, "and must light up, not just move").not.toBe(rest.glow);
 });
 
 test("the system turns clockwise, and only while the page moves", async ({ page }, info) => {
