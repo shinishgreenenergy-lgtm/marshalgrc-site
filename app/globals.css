@@ -165,10 +165,11 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
    element, not to the SVG plane: in the plane it painted before .worlds, and
    a named moon crossing the middle rode over the sun and over its label. */
 .sun{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:40;
-     width:12.8%;aspect-ratio:1;display:grid;place-content:center;place-items:center;
-     /* NB percentage padding resolves against .orrery, not this element:
-        3% was 69px of a 147px disc. 2.2% leaves the name ~66% of the disc. */
-     text-align:center;padding:0 2.2%}
+     width:8.533%;aspect-ratio:1;display:grid;place-content:center;place-items:center;
+     /* NB percentage padding resolves against .orrery, not this element, so
+        it does not shrink with the disc on its own -- at 2/3 size 2.2% left
+        47px of usable width and "Marshal" alone is wider than that. */
+     text-align:center;padding:0 .8%}
 /* Gold, and lit from upper-left like every world orbiting it. One light
    source across the whole figure is what makes the spheres read as round
    rather than as discs with a gradient on them. */
@@ -194,7 +195,7 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
 .mark-bar{stroke-width:7;stroke-linecap:round}
 .sun .sun-label{position:relative;z-index:1;margin:0;
            font-family:var(--display);font-weight:600;line-height:1.25;
-           font-size:clamp(.7rem,.95vw,.9rem);color:#160D00}
+           font-size:clamp(.68rem,.8vw,.85rem);color:#160D00}
 
 /* --lit is how lit a domain is, 0 to 1. One number drives the zoom, the
    colour and the satellites, so the scroll sweep and the pointer can both
@@ -365,21 +366,21 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
      isolation:isolate because the disc below rides at z-index:-1 -- on
      desktop the translate() contains it, and transform:none here does not. */
   .sun{position:relative;inset:auto;transform:none;width:auto;aspect-ratio:auto;
-       padding:0;min-height:clamp(8rem,38vw,10.5rem);margin:0 auto 22px;
+       padding:0;min-height:clamp(5.333rem,25.33vw,7rem);margin:0 auto 20px;
        isolation:isolate}
   /* Mark and disc share one width, which is what keeps the shield inscribed
      in the circle here exactly as it is on desktop. Sized off the viewport
      rather than off .sun, whose height is now set by these -- reading one
      from the other would be circular. */
   .sun-mark,.sun::before{position:absolute;inset:auto;left:50%;top:50%;
-            translate:-50% -50%;width:clamp(8rem,38vw,10.5rem);aspect-ratio:1}
+            translate:-50% -50%;width:clamp(5.333rem,25.33vw,7rem);aspect-ratio:1}
   /* The disc comes back at phone width. A white shield needs gold under it:
      on the bare navy field the name washed out against its own watermark,
      because the name is light here and the shield is now nearly solid. */
   .sun::before{display:block}
   /* Held narrower than the shield so the name breaks over it rather than
      running out past its shoulders. Dark on gold, as on desktop. */
-  .sun .sun-label{margin:0;max-width:clamp(4.7rem,22.4vw,6.2rem)}
+  .sun .sun-label{margin:0;max-width:clamp(3.13rem,14.93vw,4.13rem)}
   .worlds{position:static}
   .world{position:static;transform:none;z-index:auto;--near:1;--a:0deg;
          border-top:1px solid rgba(234,240,248,.16)}

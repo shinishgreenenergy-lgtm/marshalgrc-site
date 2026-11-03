@@ -25,10 +25,10 @@ const VW = 1000;
 const VH = 560;
 const CX = VW / 2;
 const CY = VH / 2;
-/** The sun's disc. Matches .sun{width:12.8%} exactly, which is what lets the
+/** The sun's disc. Matches .sun{width:8.533%} exactly, which is what lets the
     near arcs be clipped to it and pass over the library convincingly. Change
     one of the two and the near arcs stop meeting the disc's edge. */
-const SUN_R = 64;
+const SUN_R = 42.667;
 /** Innermost and outermost orbit, in viewBox units across. */
 const R0 = 160;
 const R1 = 452;
