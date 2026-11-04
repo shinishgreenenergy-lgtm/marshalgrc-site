@@ -295,6 +295,47 @@ test("the orrery never pushes the page sideways as it turns", async ({ page }, i
   }
 });
 
+test("holding a domain never pushes the page sideways", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop", "the plane only turns above 860px");
+  // The test above only ever sees the thirteen rotations a scroll happens to
+  // land on, and only ever while the figure is sweeping. A pointer holds a
+  // domain lit at ANY angle, and a held domain is the one whose labels ride
+  // out to --label-ring, so this is where a pill leaves the page. Between 861
+  // and about 1300 that is the widest the document ever gets.
+  await page.goto("/");
+  // .world.on loses --lit to the take-focus animation while the figure is
+  // still sweeping, so kill the animations and drive --spin directly rather
+  // than measuring an unlit planet and believing it.
+  await page.addStyleTag({
+    content: ".orrery,.orrery *{animation:none!important;transition:none!important}",
+  });
+  for (const width of [960, 1024, 1120, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    const held = await page.evaluate(() => {
+      const fig = document.querySelector(".orrery") as HTMLElement;
+      fig.dataset.mode = "held";
+      const worlds = [...document.querySelectorAll<HTMLElement>(".world")];
+      let over = 0;
+      let unlit = 0;
+      for (let d = 0; d < 360; d += 6) {
+        fig.style.setProperty("--spin", `${d}deg`);
+        for (const world of worlds) {
+          worlds.forEach((o) => o.classList.toggle("on", o === world));
+          if (getComputedStyle(world).getPropertyValue("--lit").trim() !== "1") unlit++;
+          const doc = document.documentElement;
+          over = Math.max(over, doc.scrollWidth - doc.clientWidth);
+        }
+      }
+      worlds.forEach((o) => o.classList.remove("on"));
+      fig.dataset.mode = "sweep";
+      fig.style.removeProperty("--spin");
+      return { over, unlit };
+    });
+    expect(held.unlit, "a domain read as unlit — the measurement is of the wrong figure").toBe(0);
+    expect(held.over, `${width}px wide, a held domain pushed the page sideways`).toBeLessThanOrEqual(0);
+  }
+});
+
 test("the hero headline is readable with motion switched off", async ({ browser }) => {
   // The juror test: kill the motion and the static frame must still hold.
   // toBeVisible() passes on a stuck reveal, so assert the settled position.

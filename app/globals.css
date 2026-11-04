@@ -148,13 +148,31 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
         aspect-ratio:1000/560;isolation:isolate;
         /* Where a standard's name sits, measured from its own planet. The
            beads no longer move, so this one length is the whole answer to
-           "how far out are the labels" — and it is a balance, not a
-           clearance. At 118px a pill still crosses the longest domain name
-           by up to 15px at 1440 and wider, and a lit QMS still reaches 37px
-           past the page edge at 870. The figure this replaced did 22px and
-           43px, and also cut 16px into the planet's own sphere, which this
-           never does. Lower crowds the name; higher costs the page edge. */
+           "how far out are the labels". Measured over 60 rotations x 8
+           domains with a domain held: at 118px a pill still crosses the
+           longest domain name by 15px, and that is the price of the room
+           below 1440 -- bigger, and the pill is cut at the viewport instead,
+           which is worse. The figure this replaced crossed by 22px and also
+           cut 16px into the planet's own sphere, which this never does.
+           Above 1440 the room IS there and the ring grows to clear the name
+           outright; see the media query at the end of this block. */
         --label-ring:118px}
+/* A lit pill rides outside the plane, so between 861 and roughly 1300 it
+   reaches past the viewport: 73px past the left edge at 870 and 37px past the
+   right. Past the left the browser has always cut it silently; past the right
+   it widened the document and the whole page scrolled sideways -- 37px here,
+   43px on the figure that shipped. Clip at the section, which is the
+   full-bleed box, so both edges behave the same way instead of one of them
+   dragging the page. `clip`, not `hidden`: hidden would make this a scroll
+   container, and the figure's own view-timeline is resolved against the
+   document. Anything this cuts was already off the page. */
+section:has(.orrery){overflow-x:clip}
+/* At 1440 and wider no pill reaches either edge even at 166px, and 166px is
+   where one finally clears the longest domain name instead of crossing it by
+   24px. Below this the room is not there: at 1366 the same ring puts a label
+   19px off the left edge, where it is cut and unreadable. A crossed name is
+   legible; a cut one is not. */
+@media (min-width:1440px){.orrery{--label-ring:166px}}
 .plane,.plane-front{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 /* The near half of every ring, clipped to the library's disc and painted over
    it, so each orbit passes behind the sun at the back and in front at the
