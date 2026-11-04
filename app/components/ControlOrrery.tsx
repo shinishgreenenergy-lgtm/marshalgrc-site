@@ -97,7 +97,9 @@ const WORLDS = SERVICES.map((s, i) => {
     body,
     /** How close to the sun, 1 to 0 — the inner worlds run hot, the outer cold. */
     heat: r2(1 - i / (N - 1)),
-    /** Moons ride clear of their own world, which is now a real sphere. */
+    /** Moons ride clear of their own world, which is now a real sphere, and
+        keep that distance lit or unlit — the label is what travels, out to
+        the figure's one --label-ring. */
     mr: r2(body / 2 + 30 + moons.length * 3),
   };
 });

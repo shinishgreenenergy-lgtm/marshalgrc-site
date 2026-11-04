@@ -11,7 +11,7 @@
 :root{
   --paper:#F7F8FA; --paper-2:#EDF1F6; --card:#FFFFFF;
   --ink:#0F3054; --ink-2:#4A5C78; --rule:#D4DCE7; --rule-2:#B9C6D8;
-  --blue:#2A6FA8; --blue-bright:#3B8DCB;
+  --blue:#2A6FA8; --blue-bright:#3B8DCB; --blue-lit:#58A6FF;
   --gold:#9C7945; --gold-ink:#7A5E30; --gold-pale:#FAF3AA;
   --field:#0F3054; --field-2:#15406F; --field-ink:#EAF0F8; --field-ink-2:#A8BDD6;
   --flag:#B3541E;
@@ -145,7 +145,16 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
    and the planets scroll OVER the nav bar. Isolated, the whole figure is one
    layer that passes under the header like any other content. */
 .orrery{position:relative;width:100%;max-width:1180px;margin-inline:auto;
-        aspect-ratio:1000/560;isolation:isolate}
+        aspect-ratio:1000/560;isolation:isolate;
+        /* Where a standard's name sits, measured from its own planet. The
+           beads no longer move, so this one length is the whole answer to
+           "how far out are the labels" — and it is a balance, not a
+           clearance. At 118px a pill still crosses the longest domain name
+           by up to 15px at 1440 and wider, and a lit QMS still reaches 37px
+           past the page edge at 870. The figure this replaced did 22px and
+           43px, and also cut 16px into the planet's own sphere, which this
+           never does. Lower crowds the name; higher costs the page edge. */
+        --label-ring:118px}
 .plane,.plane-front{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 /* The near half of every ring, clipped to the library's disc and painted over
    it, so each orbit passes behind the sun at the back and in front at the
@@ -269,14 +278,20 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
                               calc(var(--body) * .3) calc(var(--body) * -.05) rgba(44,26,0,.5),
                         0 0 0 3px rgba(9,26,48,.9),
                         0 0 30px rgba(250,243,170,.6)}
-.world-name{color:color-mix(in oklab,var(--field-ink),var(--gold-pale) calc(var(--lit) * 100%))}
+/* Held, a domain names itself in bright blue. Gold is spoken for in this
+   figure — it is the library, the orbits and every standard pill — so blue
+   is the one hue that says "this one" without joining that conversation.
+   5.3:1 on the deep blue ground, and the shadow below carries it over the
+   gold disc. */
+.world-name{color:color-mix(in oklab,var(--field-ink),var(--blue-lit) calc(var(--lit) * 100%))}
 /* Same reason: the lit name can be crossing the gold disc when it is read. */
 .world.on .world-name{text-shadow:0 1px 2px rgba(6,18,36,.95),0 0 12px rgba(6,18,36,.85)}
 
 /* Moons. Position is trigonometry on an angle that runs several times the
    world's own, so each domain visibly carries its standards round itself
-   while the whole system turns. The bead is always drawn; the name waits to
-   be asked for, because twenty-four labels at once is not a diagram. */
+   while the whole system turns. The bead is always drawn and never moves;
+   the name waits to be asked for, because twenty-four labels at once is
+   not a diagram. */
 /* Centred on the sphere, not on the button. 50%/50% is the middle of the
    whole control — body stacked over name — so the ring sat low and the pills
    landed on the domain's own label. The offset is half the name row plus the
@@ -284,17 +299,16 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
 .moons{list-style:none;margin:0;padding:0;position:absolute;left:50%;top:50%;
        width:0;height:0;pointer-events:none;z-index:-1;
        translate:0 calc(-11px - var(--lit) * 4px)}
-/* Lit, a domain's moons swing wide. At rest they are beads tucked against
-   their world; named, they need room to be read, and a pill is twenty times
-   the width of the bead it replaces. Widening the orbit is what buys that
-   room — the alternative is five labels stacked on one planet. */
-.moon{--mrl:calc(var(--mr) * (1 + var(--lit) * 1.3));
+/* A moon keeps its seat. Held or swept it stays exactly where it already
+   was and answers by lighting up, not by travelling: satellites that fly
+   away from their planet the moment you point at it read as eight separate
+   systems rather than one. Only the name moves — see .moon span. */
+.moon{--ma:calc(calc(var(--spin) * 3.4) + var(--m) * 1turn);
       position:absolute;
-      left:calc(var(--mrl) * cos(calc(var(--spin) * 3.4) + var(--m) * 1turn));
-      top:calc(var(--mrl) * sin(calc(var(--spin) * 3.4) + var(--m) * 1turn));
+      left:calc(var(--mr) * cos(var(--ma)));
+      top:calc(var(--mr) * sin(var(--ma)));
       transform:translate(-50%,-50%);
-      scale:calc(.75 + var(--near) * .25);
-      transition:left .4s ease,top .4s ease}
+      scale:calc(.75 + var(--near) * .25)}
 /* The moon itself: a little sphere, lit the same way its world is. */
 .moon::before{content:"";position:absolute;left:50%;top:50%;
               width:var(--bead,10px);height:var(--bead,10px);
@@ -310,12 +324,38 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
 .world.on .moon::before{--bead:17px;opacity:1;
                         box-shadow:0 0 16px rgba(250,243,170,.95),
                                    0 0 34px rgba(250,243,170,.45)}
+/* The bead stays home, so the name is what has to find room. --out is the
+   trip from the bead out to --label-ring along the moon's own bearing, so
+   every pill in the figure lands on ONE ring however wide its moon rides,
+   and the 50% terms lean it away from the planet rather than back across
+   it. One shared ring rather than "a bit further out than the bead" is
+   what clears the domain's own name, which hangs under the sphere and is
+   wider than any moon orbit — the inner worlds are the ones that would
+   otherwise label themselves on top of it. */
 .moon span{display:block;white-space:nowrap;padding:4px 11px;border-radius:999px;
+           /* Scaled by --lit so an unasked-for label still sits on its own
+              bead. At opacity 0 it is invisible either way, but a pill parked
+              out on the ring is still laid out, and eight domains' worth of
+              them push the page sideways at 980px and below. */
+           --out:calc((var(--label-ring) - var(--mr)) * var(--lit));
            font-size:clamp(.68rem,.9vw,.84rem);font-weight:600;
-           transform:translate(-50%,-50%) translateY(-20px);
+           transform:translate(calc(-50% + 50% * cos(var(--ma)) + var(--out) * cos(var(--ma))),
+                               calc(-50% + 50% * sin(var(--ma)) + var(--out) * sin(var(--ma))));
            color:var(--field);background:var(--gold-pale);
            box-shadow:0 2px 10px rgba(3,12,28,.45);
-           opacity:var(--lit);transition:opacity .35s ease}
+           opacity:var(--lit);
+           /* Asymmetric on purpose. Taking a domain, the pill is simply
+              there, already where it will be read — nothing flies out.
+              Letting go, it eases home while it fades, because --lit drops
+              to 0 the instant the pointer leaves and five still-opaque
+              pills snapping back onto their beads reads as a fault. The
+              same ease is what carries a label out during the scroll
+              sweep, where the moons themselves used to be the ones
+              travelling on a .4s of their own. */
+           transition:opacity .35s ease,transform .3s ease}
+/* Transition only. Setting transform here would outrank the phone
+   register's transform:none and unstack the whole list. */
+.world.on .moon span{transition:opacity .35s ease}
 
 /* ── The orrery turns ───────────────────────────────────────────────────────
    Scroll-driven, never timed. One timeline on the figure itself, not on the

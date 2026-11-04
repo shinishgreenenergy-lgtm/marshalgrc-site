@@ -195,7 +195,7 @@ test("each orbit crosses in front of the library and vanishes behind it", async 
   expect(layer.clip).toBe("url(#sun-disc)");
 });
 
-test("holding a domain grows its satellites and lights them", async ({ page }, info) => {
+test("holding a domain lights its satellites where they already sit", async ({ page }, info) => {
   test.skip(info.project.name !== "desktop", "below 860px the plane folds into a register");
   await page.goto("/");
   // The figure is scroll-driven, so moving the pointer to a planet scrolls the
@@ -209,7 +209,18 @@ test("holding a domain grows its satellites and lights them", async ({ page }, i
       );
       return { size: parseFloat(css.width), glow: css.boxShadow };
     });
+  // The beads must not travel. A domain answering by throwing its standards
+  // away from itself was the thing this figure was asked to stop doing, and
+  // it is the label, not the moon, that is allowed to move out to the ring.
+  const seats = () =>
+    page.evaluate(() =>
+      [...document.querySelectorAll('.world[data-domain="cybersecurity"] .moon')].map((m) => {
+        const css = getComputedStyle(m);
+        return `${css.left}/${css.top}`;
+      }),
+    );
   const rest = await bead();
+  const restSeats = await seats();
   await page.locator('.world[data-domain="cybersecurity"] button').hover();
   // The bead has a 0.3s transition on its size, so reading it once right after
   // the pointer lands measures the animation, not the held state.
@@ -219,6 +230,7 @@ test("holding a domain grows its satellites and lights them", async ({ page }, i
     })
     .toBeGreaterThan(rest.size);
   expect((await bead()).glow, "and must light up, not just move").not.toBe(rest.glow);
+  expect(await seats(), "satellites must light up WITHOUT leaving their world").toEqual(restSeats);
 });
 
 test("the system turns clockwise, and only while the page moves", async ({ page }, info) => {
