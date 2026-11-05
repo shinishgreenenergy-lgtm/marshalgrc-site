@@ -98,8 +98,8 @@ const WORLDS = SERVICES.map((s, i) => {
     /** How close to the sun, 1 to 0 — the inner worlds run hot, the outer cold. */
     heat: r2(1 - i / (N - 1)),
     /** Moons ride clear of their own world, which is now a real sphere, and
-        keep that distance lit or unlit — the label is what travels, out to
-        the figure's one --label-ring. */
+        keep that distance lit or unlit — the label travels only --label-gap
+        further out, so it stays with the bead it names. */
     mr: r2(body / 2 + 30 + moons.length * 3),
   };
 });

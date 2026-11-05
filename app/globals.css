@@ -146,33 +146,29 @@ p{margin:0 0 1em;max-width:66ch;text-wrap:pretty}
    layer that passes under the header like any other content. */
 .orrery{position:relative;width:100%;max-width:1180px;margin-inline:auto;
         aspect-ratio:1000/560;isolation:isolate;
-        /* Where a standard's name sits, measured from its own planet. The
-           beads no longer move, so this one length is the whole answer to
-           "how far out are the labels". Measured over 60 rotations x 8
-           domains with a domain held: at 118px a pill still crosses the
-           longest domain name by 15px, and that is the price of the room
-           below 1440 -- bigger, and the pill is cut at the viewport instead,
-           which is worse. The figure this replaced crossed by 22px and also
-           cut 16px into the planet's own sphere, which this never does.
-           Above 1440 the room IS there and the ring grows to clear the name
-           outright; see the media query at the end of this block. */
-        --label-ring:118px}
-/* A lit pill rides outside the plane, so between 861 and roughly 1300 it
-   reaches past the viewport: 73px past the left edge at 870 and 37px past the
-   right. Past the left the browser has always cut it silently; past the right
-   it widened the document and the whole page scrolled sideways -- 37px here,
-   43px on the figure that shipped. Clip at the section, which is the
-   full-bleed box, so both edges behave the same way instead of one of them
-   dragging the page. `clip`, not `hidden`: hidden would make this a scroll
-   container, and the figure's own view-timeline is resolved against the
-   document. Anything this cuts was already off the page. */
+        /* How far a standard's name sits from its own bead, and the one
+           knob for it. It was a shared ring: every pill landed on the same
+           radius from the PLANET, which put a label 47px from its bead on
+           the outer domains and 112px on the inner ones at 1440 and wider.
+           Tidy as a ring, but it read as eight labels floating loose -- at
+           1440 "India DPDP Act" sat on the Cybersecurity planet, naming the
+           wrong world. A fixed trip from the bead keeps every label with the
+           satellite it belongs to. The 50% terms in the transform below
+           already lean the pill clear of the bead, so this is the gap on top
+           of that. Lower starts hiding pill text behind the planet, which
+           paints over it (.moons sits at z-index:-1). */
+        --label-gap:28px}
+/* A lit pill rides outside the plane, so at the narrow end of the desktop
+   range it still reaches past the viewport: 45px past the left edge at 870
+   and 4px past the right, with the labels pulled in to --label-gap. Past the
+   left the browser has always cut it silently; past the right it widened the
+   document and the whole page scrolled sideways -- 37px when the labels sat
+   out on a shared ring, 43px on the figure before that. Clip at the section,
+   which is the full-bleed box, so both edges behave the same way instead of
+   one of them dragging the page. `clip`, not `hidden`: hidden would make this
+   a scroll container, and the figure's own view-timeline is resolved against
+   the document. Anything this cuts was already off the page. */
 section:has(.orrery){overflow-x:clip}
-/* At 1440 and wider no pill reaches either edge even at 166px, and 166px is
-   where one finally clears the longest domain name instead of crossing it by
-   24px. Below this the room is not there: at 1366 the same ring puts a label
-   19px off the left edge, where it is cut and unreadable. A crossed name is
-   legible; a cut one is not. */
-@media (min-width:1440px){.orrery{--label-ring:166px}}
 .plane,.plane-front{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 /* The near half of every ring, clipped to the library's disc and painted over
    it, so each orbit passes behind the sun at the back and in front at the
@@ -343,22 +339,32 @@ section:has(.orrery){overflow-x:clip}
                         box-shadow:0 0 16px rgba(250,243,170,.95),
                                    0 0 34px rgba(250,243,170,.45)}
 /* The bead stays home, so the name is what has to find room. --out is the
-   trip from the bead out to --label-ring along the moon's own bearing, so
-   every pill in the figure lands on ONE ring however wide its moon rides,
-   and the 50% terms lean it away from the planet rather than back across
-   it. One shared ring rather than "a bit further out than the bead" is
-   what clears the domain's own name, which hangs under the sphere and is
-   wider than any moon orbit — the inner worlds are the ones that would
-   otherwise label themselves on top of it. */
+   trip out from the bead along the moon's own bearing, and the 50% terms
+   lean the pill away from the planet rather than back across it -- together
+   they put the pill's near edge --label-gap from the bead it names. The
+   cost of staying close is that the pill crosses the domain's own name,
+   which hangs under the sphere and is wider than any moon orbit: about 23px
+   on the inner worlds. A label beside the wrong planet is the worse fault
+   of the two. */
 .moon span{display:block;white-space:nowrap;padding:4px 11px;border-radius:999px;
            /* Scaled by --lit so an unasked-for label still sits on its own
               bead. At opacity 0 it is invisible either way, but a pill parked
-              out on the ring is still laid out, and eight domains' worth of
+              out at the gap is still laid out, and eight domains' worth of
               them push the page sideways at 980px and below. */
-           --out:calc((var(--label-ring) - var(--mr)) * var(--lit));
+           --out:calc(var(--label-gap) * var(--lit));
            font-size:clamp(.68rem,.9vw,.84rem);font-weight:600;
-           transform:translate(calc(-50% + 50% * cos(var(--ma)) + var(--out) * cos(var(--ma))),
-                               calc(-50% + 50% * sin(var(--ma)) + var(--out) * sin(var(--ma))));
+           /* The moon box is already centred on its bead, so the pill's own
+              untransformed centre sits ON the bead: there is no -50% to pay
+              here, and the one that used to be was counted twice. It made
+              the gap depend on which way the label pointed -- a pill bearing
+              left sat 86px off its bead while one bearing right covered it
+              by 30px, which is what read as "the names are showing very far"
+              on half the figure. (50% + --out) along the bearing puts the
+              pill's near edge exactly --label-gap from the bead on every
+              bearing: 50% of the width in x, of the height in y, which is
+              the pill's own half-extent in each axis. */
+           transform:translate(calc((50% + var(--out)) * cos(var(--ma))),
+                               calc((50% + var(--out)) * sin(var(--ma))));
            color:var(--field);background:var(--gold-pale);
            box-shadow:0 2px 10px rgba(3,12,28,.45);
            opacity:var(--lit);

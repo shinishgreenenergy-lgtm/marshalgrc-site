@@ -300,7 +300,7 @@ test("holding a domain never pushes the page sideways", async ({ page }, info) =
   // The test above only ever sees the thirteen rotations a scroll happens to
   // land on, and only ever while the figure is sweeping. A pointer holds a
   // domain lit at ANY angle, and a held domain is the one whose labels ride
-  // out to --label-ring, so this is where a pill leaves the page. Between 861
+  // out past their beads, so this is where a pill leaves the page. Between 861
   // and about 1300 that is the widest the document ever gets.
   await page.goto("/");
   // .world.on loses --lit to the take-focus animation while the figure is
