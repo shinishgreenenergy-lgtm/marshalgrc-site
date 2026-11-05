@@ -11,7 +11,7 @@
 :root{
   --paper:#F7F8FA; --paper-2:#EDF1F6; --card:#FFFFFF;
   --ink:#0F3054; --ink-2:#4A5C78; --rule:#D4DCE7; --rule-2:#B9C6D8;
-  --blue:#2A6FA8; --blue-bright:#3B8DCB; --blue-lit:#58A6FF;
+  --blue:#2A6FA8; --blue-bright:#3B8DCB; --blue-lit:#8AD8FF; --blue-sheen:#E8F7FF;
   --gold:#9C7945; --gold-ink:#7A5E30; --gold-pale:#FAF3AA;
   --field:#0F3054; --field-2:#15406F; --field-ink:#EAF0F8; --field-ink-2:#A8BDD6;
   --flag:#B3541E;
@@ -292,14 +292,23 @@ section:has(.orrery){overflow-x:clip}
                               calc(var(--body) * .3) calc(var(--body) * -.05) rgba(44,26,0,.5),
                         0 0 0 3px rgba(9,26,48,.9),
                         0 0 30px rgba(250,243,170,.6)}
-/* Held, a domain names itself in bright blue. Gold is spoken for in this
-   figure — it is the library, the orbits and every standard pill — so blue
-   is the one hue that says "this one" without joining that conversation.
-   5.3:1 on the deep blue ground, and the shadow below carries it over the
-   gold disc. */
-.world-name{color:color-mix(in oklab,var(--field-ink),var(--blue-lit) calc(var(--lit) * 100%))}
+/* Held, a domain names itself in a bright metallic blue. Gold is spoken for
+   in this figure — it is the library, the orbits and every standard pill —
+   so blue is the one hue that says "this one" without joining that
+   conversation. 8.5:1 on the deep blue ground, up from 5.3:1.
+   The metal is two shadows rather than a gradient: a pale edge along the top
+   of the glyphs for the bevel, and a blue bloom under them. Both are scaled
+   by --lit, so the scroll sweep lights a name exactly as the pointer does,
+   and both stay in `color`/`text-shadow` — a background-clip:text gradient
+   could not be mixed from --field-ink as --lit rises. No transition on
+   either: --lit is scroll-animated, and anything derived from it that
+   transitions is paid again on every frame of the sweep. */
+.world-name{color:color-mix(in oklab,var(--field-ink),var(--blue-lit) calc(var(--lit) * 100%));
+            --sheen:0 -1px 0 color-mix(in srgb,var(--blue-sheen),transparent calc(100% - var(--lit) * 55%)),
+                    0 0 calc(var(--lit) * 16px) color-mix(in srgb,var(--blue-lit),transparent calc(100% - var(--lit) * 70%));
+            text-shadow:var(--sheen)}
 /* Same reason: the lit name can be crossing the gold disc when it is read. */
-.world.on .world-name{text-shadow:0 1px 2px rgba(6,18,36,.95),0 0 12px rgba(6,18,36,.85)}
+.world.on .world-name{text-shadow:0 1px 2px rgba(6,18,36,.95),0 0 12px rgba(6,18,36,.85),var(--sheen)}
 
 /* Moons. Position is trigonometry on an angle that runs several times the
    world's own, so each domain visibly carries its standards round itself
