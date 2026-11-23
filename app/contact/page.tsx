@@ -44,6 +44,21 @@ export default function ContactPage() {
                 ))}
               </address>
             </div>
+            <div className="block">
+              <h3>US liaison office</h3>
+              {/* Every line breaks here, unlike the India block: the number
+                  follows the address inside the same <address>, which is the
+                  element for a contact point. A <p> after it would sit flush,
+                  since .reach-list .block p has no top margin. */}
+              <address>
+                {CONTACT.reach.us.map((l) => (
+                  <span key={l}>{l}<br /></span>
+                ))}
+                <a href={`tel:${CONTACT.reach.usPhone.replace(/[^\d+]/g, "")}`}>
+                  {CONTACT.reach.usPhone}
+                </a>
+              </address>
+            </div>
           </aside>
         </div>
       </div>

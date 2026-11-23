@@ -33,8 +33,11 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: SITE.name, description: SITE.description },
 };
 
-/** Only facts that are actually known go in the structured data. There is one
- *  office and one number now, so both are here; nothing else is claimed. */
+/** Only facts that are actually known go in the structured data. Two offices
+ *  and two numbers now: the registered one in Visakhapatnam, which /terms and
+ *  /privacy name as both the operator and the jurisdiction, and the US liaison
+ *  office. The US entry carries no postalCode because none was given, and
+ *  nothing else is claimed. */
 const organization = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -42,16 +45,25 @@ const organization = {
   description: SITE.description,
   url: SITE.origin,
   email: SITE.email,
-  telephone: "+919989661572",
+  telephone: ["+919989661572", "+12158049493"],
   parentOrganization: { "@type": "Organization", name: SITE.parent },
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "D No: 14-164/1/2, Parvati Nilayam, Chinamushidiwada",
-    addressLocality: "Visakhapatnam",
-    addressRegion: "Andhra Pradesh",
-    postalCode: "530051",
-    addressCountry: "IN",
-  },
+  address: [
+    {
+      "@type": "PostalAddress",
+      streetAddress: "D No: 14-164/1/2, Parvati Nilayam, Chinamushidiwada",
+      addressLocality: "Visakhapatnam",
+      addressRegion: "Andhra Pradesh",
+      postalCode: "530051",
+      addressCountry: "IN",
+    },
+    {
+      "@type": "PostalAddress",
+      streetAddress: "422 Brister Road",
+      addressLocality: "Bensalem",
+      addressRegion: "PA",
+      addressCountry: "US",
+    },
+  ],
   areaServed: ["India", "United States", "Canada", "Europe", "Middle East", "East Asia"],
 };
 

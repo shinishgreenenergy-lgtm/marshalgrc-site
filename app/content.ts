@@ -352,6 +352,10 @@ export const CONTACT = {
     /** Display form; the wa.me link strips it back to digits at the call site. */
     whatsapp: "+91 99896 61572",
     india: ["Stellar Global", "D No: 14-164/1/2, Parvati Nilayam", "Chinamushidiwada, Visakhapatnam", "Andhra Pradesh 530051, India"],
+    us: ["422, Brister Road", "Bensalem, PA"],
+    /** Display form. Unlike the WhatsApp one, the tel: link at the call site
+     *  keeps the "+": tel:12158049493 does not dial from outside the US. */
+    usPhone: "+1 215 804 9493",
   },
   next: {
     heading: "What happens after you get in touch",
